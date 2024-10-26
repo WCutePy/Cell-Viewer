@@ -1,3 +1,4 @@
+import polars as pl
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -18,19 +19,15 @@ def input_data(request):
         return
     if "inputData" not in request.FILES:
         return
-    
+
     file = request.FILES["inputData"]
-    data = []
+    data = pl.read_csv(file)
     
-    header = file.readline()
-    header = header.decode("ascii").strip().split(",")
-    while line := file.readline():  # iterates through a while loop, as a for loop restarts the position to 0 on in memory file.
-        line = line.decode("ascii")
-        well, site, cell, *substances = line.strip().split(",")
-        data.append((well, site, cell, *substances))
-    
+    header = data.columns
+
     context = {
-        "header": header,
-        "data": data
-    }
+            "header": header,
+            "data": data.head(8).rows()
+        }
+
     return render(request, "cellviews/components/data_summary_table.html", context)
