@@ -1,6 +1,6 @@
 
-  <!-- Summary uploaded data widget -->
-  <div class="flex flex-wrap ">
+<!-- Summary uploaded data widget -->
+<div class="flex flex-wrap ">
   <div class="w-full">
     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
       <div class="rounded-t-lg py-3 dark:bg-gray-800 dark:text-white px-4">
@@ -14,12 +14,12 @@
             <thead class="bg-gray-100 dark:bg-gray-700">
               <tr>
                 {% for title in header %}
-                <th class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">{{ title }}</th>
+                  <th class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">{{ title }}</th>
                 {% endfor %}
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                {% for line in data %}
+                {% for line in table_data %}
                 <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
                   {% for element in line %}
                   <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -28,7 +28,6 @@
                   {% endfor %}
                 </tr>
                 {% endfor %}
-
             </tbody>
           </table>
         </div>
