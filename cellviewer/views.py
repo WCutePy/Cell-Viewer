@@ -1,10 +1,12 @@
+import json
+
 import polars as pl
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 import csv
 
-from .models import *
+from .util import plots
 
 
 def index(request):
@@ -24,10 +26,14 @@ def input_data(request):
     data = pl.read_csv(file)
     
     header = data.columns
+    
+    hists = plots.create_all_hist_html(data, header[3:])
 
     context = {
             "header": header,
-            "data": data.head(8).rows()
+            "table_data": data.head(8).rows(),
+            "hists": json.dumps(hists),
+            "hist_amount": range(len(hists)),
         }
 
-    return render(request, "cellviews/components/data_summary_table.html", context)
+    return render(request, "cellviews/components/post_upload_page_part.html", context)

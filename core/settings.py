@@ -45,6 +45,7 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -59,6 +60,12 @@ INSTALLED_APPS = [
     "apps.charts", 
     "apps.tables",
     "apps.tasks",
+    
+    "cellviewer",
+    "celldash",
+    
+    "django_plotly_dash.apps.DjangoPlotlyDashConfig",
+    "channels",
 
     "django_celery_results",
 
@@ -82,6 +89,15 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379),],
+        },
+    },
+}
+
 ROOT_URLCONF = "core.urls"
 
 UI_TEMPLATES = os.path.join(BASE_DIR, 'templates') 
@@ -102,7 +118,10 @@ TEMPLATES = [
     },
 ]
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 WSGI_APPLICATION = "core.wsgi.application"
+ASGI_APPLICATION = "core.asgi.application"
 
 
 # Database
@@ -175,6 +194,29 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+STATICFILES_FINDERS = [
+
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+
+    'django_plotly_dash.finders.DashAssetFinder',
+    'django_plotly_dash.finders.DashComponentFinder',
+    'django_plotly_dash.finders.DashAppDirectoryFinder',
+]
+
+PLOTLY_COMPONENTS = [
+
+    # Common components (ie within dash itself) are automatically added
+
+    # # django-plotly-dash components
+    # 'dpd_components',
+    # # static support if serving local assets
+    # 'dpd_static_support',
+
+    # Other components, as needed
+    'dash_bootstrap_components',
+]
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

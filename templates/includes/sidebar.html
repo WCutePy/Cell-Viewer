@@ -32,8 +32,18 @@
                                 <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
                                 <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
                             </svg>
-                            <span class="ml-3" sidebar-toggle-item>Dashboard</span>
+                            <span class="ml-3" sidebar-toggle-item>Upload</span>
                         </a>
+                        <ul id="dropdown-upload" class="py-2 space-y-2 block ml-8 hidden">
+                            <li class="">
+                                <button id="upload-current-page"
+                                    class="flex w-full items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'datatables' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Current</button>
+                            </li>
+                            <li class="">
+                                <button id="upload-plots-page"
+                                    class="flex w-full items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'datatables' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Plots</button>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <a href="/starter/"
