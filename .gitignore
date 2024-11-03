@@ -8,6 +8,7 @@
 build/
 env
 env_linux
+db.sqlite3
 
 #src
 #*.sqlite*

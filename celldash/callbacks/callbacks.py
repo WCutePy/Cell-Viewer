@@ -10,6 +10,8 @@ import shutil
 import plotly.express as px
 import dash_bootstrap_components as dbc
 from django_plotly_dash import DjangoDash
+from django.core.exceptions import SuspiciousOperation
+from io import StringIO
 
 width_histogram = 5
 UPlOAD_FOLDER_ROOT = '/tmp/uploads/'
@@ -49,20 +51,26 @@ def update_output(n_clicks, value):
             Output('intermediate-value', 'data')],
     [Input('uploaded', "n_clicks")],
 )
-def callback_on_completion(n):
+def on_page_load(n, request):
     html_element = html.Ul([html.Li(str("test"))])
-    latest_file = "240306-EXP3-2-plate_1output.csv"
-    df = pd.read_csv(latest_file,
-                     usecols=use_cols)
+    
+    df_content = request.session.get("celldash_df_data", None)
+    if df_content is None:
+        raise SuspiciousOperation("The celldash_df_data has not been set")
+    
+    df = pd.read_csv(StringIO(df_content))
+    del request.session["celldash_df_data"]
+
     sox17_max = df["SOX17"].max()
     oct4_max = df["OCT4"].max()
     df_dump = df.to_json(orient='split')
     df_dump_filename = {
         'df': df_dump,
-        'filename': str(latest_file),
+        'filename': "",
         'sox17_max': sox17_max,
         'oct4_max': oct4_max
     }
+    
     return html_element, json.dumps(df_dump_filename)
 
 
