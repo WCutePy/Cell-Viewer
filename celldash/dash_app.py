@@ -43,7 +43,14 @@ app.layout = html.Div([
             html.H2('File upload and overview'),
             # File upload component
             # get_upload_component(id='upload-data'),
-            dcc.Interval(id='upload-data', max_intervals=10),
+            # dcc.Interval(id='upload-data', max_intervals=10),
+            html.Div(dcc.Input(id='input-on-submit', type='text')),
+            html.Button('Submit', id='submit-val', n_clicks=0),
+            html.Div(id='container-button-basic',
+                     children='Enter a value and press submit'),
+            
+            html.Button("get plots??", id="uploaded", n_clicks=0),
+            
             html.Div(id='callback-output'),
             html.Br(),
             html.Button('Store File', id='button-store-file'),
@@ -109,55 +116,6 @@ app.layout = html.Div([
     # dcc.Store stores the intermediate value
     dcc.Store(id='intermediate-value'),
 ])
-
-
-# app.layout = html.Div([
-#             html.H2('Histograms of OCT4 and SOX17 intensity values'),
-#             dbc.Row(
-#                 [
-#                     # Hist A
-#                     dbc.Col(
-#                         dcc.Graph(id='histogram-plot-a'),
-#                         width=width_histogram
-#                     ),
-#                     # Hist B
-#                     dbc.Col(
-#                         dcc.Graph(id='histogram-plot-b'),
-#                         width=width_histogram
-#                     ),
-#                 ]
-#             ),
-#             dbc.Row(
-#                 [
-#                     dbc.Col(
-#                             # Slider to select OCT4 lower limit
-#                             [html.H2('Select OCT4 min'),
-#                             html.Br(),
-#                             html.Div(id='OCT4-slider')],
-#                             width=width_histogram),
-#                     dbc.Col(
-#                             # Slider to select SOX17 lower limit
-#                             [html.H2('Select SOX17 min'),
-#                             html.Br(),
-#                             html.Div(id='SOX17-slider')],
-#                             width=width_histogram)
-#                 ]
-#             ),
-#             # Heatmap cell counts
-#             html.Br(),
-#             html.H2('Heatmap of total cell counts per well'),
-#             dcc.Graph(id='heatmap-fig'),
-#
-#             # Heatmap percent cells double positive
-#             html.Br(),
-#             html.H2('Heatmap of percentage of double positive cell counts \
-#                     per well'),
-#             html.P("""The percentage of cells that are double positive
-#                    (SOX17 and OCT4 above the set threshold)"""),
-#             html.Div(id='filter-description'),
-#             dcc.Graph(id='heatmap_pct-fig'),
-#         ]
-# )
 
 
 

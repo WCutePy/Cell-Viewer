@@ -1,5 +1,5 @@
 from dash import Dash, dcc, html, Input, Output, \
-    callback, no_update
+    callback, no_update, State
 from pathlib import Path
 from io import StringIO
 # import dash_uploader as du
@@ -31,11 +31,25 @@ app = DjangoDash(
 use_cols = ["Well", "Site", "Cell", "OCT4", "SOX17"]
 
 
-@callback(
-    output=[Output('callback-output', 'children'),
+@app.callback(
+    Output('container-button-basic', 'children'),
+    Input('submit-val', 'n_clicks'),
+    State('input-on-submit', 'value'),
+    prevent_initial_call=True
+)
+def update_output(n_clicks, value):
+    return 'The input value was "{}" and the button has been clicked {} times'.format(
+        value,
+        n_clicks
+    )
+
+
+@app.callback(
+    [Output('callback-output', 'children'),
             Output('intermediate-value', 'data')],
-    id='upload-data')
-def callback_on_completion():
+    [Input('uploaded', "n_clicks")],
+)
+def callback_on_completion(n):
     html_element = html.Ul([html.Li(str("test"))])
     latest_file = "240306-EXP3-2-plate_1output.csv"
     df = pd.read_csv(latest_file,
@@ -52,7 +66,7 @@ def callback_on_completion():
     return html_element, json.dumps(df_dump_filename)
 
 
-@callback(Output("stored-file-confirm", "children"),
+@app.callback(Output("stored-file-confirm", "children"),
           [Input("button-store-file", "n_clicks"),
            Input('intermediate-value', 'data')])
 def store_file(n_clicks, jsonified_df):
@@ -67,7 +81,7 @@ def store_file(n_clicks, jsonified_df):
         return f"File has been successfuly copied in {UPlOAD_FOLDER_STORE}"
 
 
-@callback(
+@app.callback(
     [Output('head-table', 'columns'),
      Output('head-table', 'data'),
      Output('file-description', 'children')],
@@ -87,7 +101,7 @@ def load_data(jsonified_df):
 
 
 # Callback to update the histogram A plot based on the selected column
-@callback(
+@app.callback(
     [Output('histogram-plot-a', 'figure'),
      Output('histogram-plot-b', 'figure')],
     [Input('intermediate-value', 'data')]
@@ -97,7 +111,7 @@ def update_histogram(jsonified_df):
         return no_update
     selected_column = "OCT4"
     df_filename = json.loads(jsonified_df)
-    df = pd.read_json(StringIO(df_filename['df']), orient='split') 
+    df = pd.read_json(StringIO(df_filename['df']), orient='split')
     hist_oct4 = create_hist(df, selected_column="OCT4")
     hist_sox17 = create_hist(df, selected_column="SOX17")
     return hist_oct4, hist_sox17
@@ -116,7 +130,7 @@ def create_hist(df, selected_column):
                         nbins=400)
     return hist
 
-@callback(Output('OCT4-slider', 'children'),
+@app.callback(Output('OCT4-slider', 'children'),
           Input('intermediate-value', 'data')
 )
 def create_oct4_slider(jsonified_df):
@@ -126,14 +140,14 @@ def create_oct4_slider(jsonified_df):
         df_filename = json.loads(jsonified_df)
         oct4_max = df_filename["oct4_max"]
     oct4_slider = dcc.Slider(id='OCT4_low',
-                              min=0, 
-                              max=oct4_max, 
-                              marks={0: "0", oct4_max:str(oct4_max)}, 
+                              min=0,
+                              max=oct4_max,
+                              marks={0: "0", oct4_max:str(oct4_max)},
                               tooltip={"placement": "bottom", "always_visible": True},
                               value=round(oct4_max/2, 1))
     return oct4_slider
 
-@callback(Output('SOX17-slider', 'children'),
+@app.callback(Output('SOX17-slider', 'children'),
           Input('intermediate-value', 'data')
 )
 def create_sox17_slider(jsonified_df):
@@ -143,15 +157,15 @@ def create_sox17_slider(jsonified_df):
         df_filename = json.loads(jsonified_df)
         sox17_max = df_filename["sox17_max"]
     sox17_slider = dcc.Slider(id='SOX17_low',
-                              min=0, 
-                              max=sox17_max, 
-                              marks={0: "0", sox17_max:str(sox17_max)}, 
+                              min=0,
+                              max=sox17_max,
+                              marks={0: "0", sox17_max:str(sox17_max)},
                               tooltip={"placement": "bottom", "always_visible": True},
                               value=round(sox17_max/2, 1))
     return sox17_slider
 
 
-@callback(
+@app.callback(
     [Output('heatmap-fig', 'figure'),
      Output('heatmap_pct-fig', 'figure'),
      Output('filter-description', 'children')],
@@ -173,7 +187,7 @@ def heatmap(jsonified_df, oct4_low, sox17_low):
         {sox17_low} for SOX17 and {oct4_low} for OCT4"
 
     # Heatmap percent
-    matrix_well_counts = get_well_count_matrix(df, 
+    matrix_well_counts = get_well_count_matrix(df,
                                                oct4_low=oct4_low,
                                                sox17_low=sox17_low)
     well_count_matrix_percent = 100*matrix_well_counts/\
@@ -184,8 +198,8 @@ def heatmap(jsonified_df, oct4_low, sox17_low):
 
 def get_well_count_matrix(df, oct4_low=0, sox17_low=0):
     """
-    Returns a cell count matrix representing the cell counts in 
-    each well in the physical plate where cells are grown. Input data 
+    Returns a cell count matrix representing the cell counts in
+    each well in the physical plate where cells are grown. Input data
     frame is filtered on minimum threshholds of oct4 and sox17
     """
     df = df[(df['OCT4']>oct4_low) & (df["SOX17"]>sox17_low)]
