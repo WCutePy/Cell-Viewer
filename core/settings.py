@@ -45,7 +45,6 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -65,7 +64,6 @@ INSTALLED_APPS = [
     "celldash",
     
     "django_plotly_dash.apps.DjangoPlotlyDashConfig",
-    "channels",
 
     "django_celery_results",
 
@@ -74,7 +72,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_api_gen',
 
-    "debug_toolbar",
+    # "debug_toolbar",
 ]
 
 MIDDLEWARE = [
@@ -88,15 +86,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379),],
-        },
-    },
-}
 
 ROOT_URLCONF = "core.urls"
 
@@ -123,6 +112,7 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 WSGI_APPLICATION = "core.wsgi.application"
 ASGI_APPLICATION = "core.asgi.application"
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
