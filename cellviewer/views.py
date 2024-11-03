@@ -1,5 +1,7 @@
+import base64
 import json
 
+import pandas as pd
 import polars as pl
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -27,13 +29,15 @@ def input_data(request):
     
     header = data.columns
     
-    hists = plots.create_all_hist_html(data, header[3:])
+    request.session["celldash_df_data"] = file.open().read().decode("utf-8")
+    
+    request.session.modified = True
 
     context = {
             "header": header,
             "table_data": data.head(8).rows(),
-            "hists": json.dumps(hists),
-            "hist_amount": range(len(hists)),
+            # "hists": json.dumps(hists),
+            # "hist_amount": range(len(hists)),
         }
 
     return render(request, "cellviews/components/post_upload_page_part.html", context)
