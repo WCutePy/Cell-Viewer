@@ -18,7 +18,8 @@ node_modules
 yarn.lock
 
 tasks_logs/
-#media/
+/media/*
+!/media/**/
 
 apps/common/management
 apps/helpers

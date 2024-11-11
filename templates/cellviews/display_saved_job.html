@@ -1,0 +1,18 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<main>
+  <div class="px-4 pt-6">
+      
+      {% include 'cellviews/components/dash_embed.html' %}
+      
+  </div>
+
+</main>
+
+{% endblock content %}
+
+{%load plotly_dash%}

@@ -1,5 +1,11 @@
+{% extends "layouts/base.html" %}
+{% load static %}
 
-<!-- Summary uploaded data widget -->
+{% block content %}
+
+<main>
+  <div class="px-4 pt-6">
+      
 <div class="flex flex-wrap ">
   <div class="w-full">
     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
@@ -19,11 +25,16 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                {% for line in table_data %}
+                {% for line in jobs %}
                 <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
-                  {% for element in line %}
+                  {% for element in line|slice:"1:" %}
                   <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <p class="text-sm mb-0">{{ element }}</p>
+                    {% if forloop.counter0 == 0 %}
+                      <a href="saved_jobs/{{ line.0 }}" class="text-sm mb-0">{{ element }}</a>
+                    {% else %}
+                      <p class="text-sm mb-0">{{ element }}</p>
+                    {% endif %}
+                    
                   </td>
                   {% endfor %}
                 </tr>
@@ -35,3 +46,8 @@
     </div>
   </div>
 </div>
+      
+  </div>
+</main>
+
+{% endblock content %}

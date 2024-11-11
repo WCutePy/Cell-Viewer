@@ -1,8 +1,6 @@
 {% extends "layouts/base.html" %}
 {% load static %}
 
-<script src="{% static 'dash/your_script.js' %}"></script>  <!-- Load your specific script -->
-</head>
 
 {% block content %}
 
@@ -16,40 +14,31 @@
             <h3 class="text-base font-normal text-gray-500 dark:text-gray-400">
               ApexCharts Sample
             </h3>
-{#            <input type="file" id="inputData" name="inputData" hx-post="" hx-swap="outerHTML"#}
-{#                    class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl dark:text-white"#}
-{#              >Upload data set>#}
               
-            <form id='form' hx-encoding='multipart/form-data' hx-post='/input_data' hx-target="#data-summary"
-                    hx-on="htmx:afterOnLoad: handleBeforeSwap(event)">
+            <form id='form' hx-encoding='multipart/form-data' hx-post='/input_data' hx-target="#dash-requester">
               <input type='file' id="inputData" name="inputData">
               <button>
                 Upload
               </button>
 {#              <progress id='progress' value='0' max='100'></progress>#}
             </form>
-
-              <script>
-
-                  function handleBeforeSwap(event) {
-                      console.log("hi");
-                      Plotly.purge("histogram0");
-                      Plotly.purge("histogram1");
-                  }
-
-              </script>
           </div>
         </div>
           
     </div>
       
-      <br>
+    <br>
       
-      <!-- Summary uploaded data widget -->
-      <div id="data-summary"></div>     
-      {%load plotly_dash%}
+    <!-- Summary uploaded data widget -->
+    <div id="dash-requester"></div>
+      
+  </div>
+    
+  <div class="px-4 pt-6" id="dash-embed">
       
   </div>
 </main>
 
 {% endblock content %}
+
+{%load plotly_dash%}
