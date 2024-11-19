@@ -51,9 +51,9 @@ def on_page_load(n, request):
     del request.session["celldash_df_data"]
     
     labels = request.session["celldash_labels"]
-    default_labels = request.session["celldash_default_labels"]
+    # default_labels = request.session["celldash_default_labels"]
     del request.session["celldash_labels"]
-    del request.session["celldash_default_labels"]
+    # del request.session["celldash_default_labels"]
     
     sox17_max = df["SOX17"].max()
     oct4_max = df["OCT4"].max()
@@ -64,7 +64,7 @@ def on_page_load(n, request):
         'sox17_max': sox17_max,
         'oct4_max': oct4_max,
         'labels': labels,
-        'default_labels': default_labels,
+        # 'default_labels': default_labels,
     }
     
     return html_element, json.dumps(df_dump_filename)

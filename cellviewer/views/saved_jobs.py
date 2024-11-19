@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from cellviewer.models import SavedJob
+from cellviewer.models.SavedJob import SavedJob
 
 
 def saved_jobs(request):
@@ -28,7 +28,12 @@ def display_job(request, job_id: int):
     
     print(job.file)
     file = job.file
+    label_matrix = job.label_matrix
+    labels = (label_matrix.rows.split(",,,"),
+              label_matrix.cols.split(",,,"),
+              label_matrix.cells.split(",,,"))
     request.session["celldash_df_data"] = file.open().read().decode("utf-8")
+    request.session["celldash_labels"] = labels
     return render(request, "cellviews/display_saved_job.html")
 
 
