@@ -1,6 +1,6 @@
 import polars as pl
 from django.shortcuts import render
-from cellviewer.models import SavedJob, file_dimensions
+from cellviewer.models.SavedJob import SavedJob, file_dimensions
 
 
 def index(request):
@@ -63,13 +63,14 @@ def dash_or_save(request):
         SavedJob.objects.create(
             request,
             file,
-            name
+            name,
+            labels
         )
         return
     elif request.POST.get("submit") == "load":
         request.session["celldash_df_data"] = file.open().read().decode("utf-8")
         
-        request.session["celldash_default_labels"] = default_labels
+        # request.session["celldash_default_labels"] = default_labels
         request.session["celldash_labels"] = labels
         
         return render(request, "cellviews/components/dash_embed.html")
