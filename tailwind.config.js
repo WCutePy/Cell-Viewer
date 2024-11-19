@@ -2,7 +2,8 @@ module.exports = {
   content: [
     './templates/**/*.html',
     './static/**/*.js',
-    './node_modules/flowbite/**/*.js'
+    './node_modules/flowbite/**/*.js',
+    './components/**/*'
   ],
   safelist: [
     'w-64',

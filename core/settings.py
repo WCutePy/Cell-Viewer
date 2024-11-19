@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "celldash",
     
     "django_plotly_dash.apps.DjangoPlotlyDashConfig",
+    'django_components',
 
     "django_celery_results",
 
@@ -95,7 +96,6 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [UI_TEMPLATES],
-        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -103,7 +103,25 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
+            
+            # django-components
+            'loaders': [(
+                'django.template.loaders.cached.Loader', [
+                    # Default Django loader
+                    'django.template.loaders.filesystem.Loader',
+                    # Inluding this is the same as APP_DIRS=True
+                    'django.template.loaders.app_directories.Loader',
+                    # Components loader
+                    'django_components.template_loader.Loader',
+                ]
+            )],
+            
+            'builtins': [
+                'django_components.templatetags.component_tags',
+            ]
         },
+        
+
     },
 ]
 
@@ -193,6 +211,8 @@ STATICFILES_FINDERS = [
     'django_plotly_dash.finders.DashAssetFinder',
     'django_plotly_dash.finders.DashComponentFinder',
     'django_plotly_dash.finders.DashAppDirectoryFinder',
+    
+    "django_components.finders.ComponentsFileSystemFinder",
 ]
 
 PLOTLY_COMPONENTS = [
@@ -276,6 +296,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'text-red-800 border border-red-300 bg-red-50 dark:text-red-400 dark:border-red-800',
 }
 
+# this needed to be added to get INFO level logging.
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -288,4 +309,11 @@ LOGGING = {
         "handlers": ["console"],
         "level": "INFO",
     },
+}
+
+# adds django-components to be seen
+COMPONENTS = {
+    "dirs": [
+         os.path.join(BASE_DIR, "components"),
+     ],
 }
