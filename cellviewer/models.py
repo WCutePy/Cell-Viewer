@@ -1,3 +1,6 @@
+import os
+from string import digits, ascii_letters
+
 from django.db import models
 from django.contrib.auth.models import User
 from time import time
@@ -11,30 +14,35 @@ def file_path(instance, filename) -> str:
     return f"saved_job/{instance.user.id}/{filename}_{int(time())}"
 
 
-def file_dimensions(file: "InMemoryUploadedFile") -> tuple[int, str]:
-    df = pl.read_csv(file)
+def file_dimensions(df: pl.DataFrame) -> tuple[int, tuple[list[str], list[str]]]:
     rows = df.height
     name = df.columns[0]
-    # unique_letters = df[name].str.extract(r"([A-Za-z]+)", 1).unique().height
-    # unique_numbers = df[name].str.extract(r"(\d+)", 1).unique().height
-    #
-    # dimension = f"{unique_letters}x{unique_numbers}"
-    dimension = "axb"
-    return rows, dimension
+    tags = df[name].arr.explode().unique().to_list()
+    
+    letters = sorted(set(t.strip(digits) for t in tags))
+    numbers = sorted(set(t.strip(ascii_letters) for t in tags))
+    return rows, (letters, numbers)
 
 
 class SavedJobManager(models.Manager):
-    def create(self, request, file: "InMemoryUploadedFile"):
+    def create(self, request, file: "InMemoryUploadedFile", name: str):
+        df = pl.read_csv(file)
         
-        row_count, dimension = file_dimensions(file)
+        row_count, dimension = file_dimensions(df)
+        dimension = f"{len(dimension[0])}x{len(dimension[1])}"
         
         saved = super().create(
             user_id=request.user.id,
-            name="test",
+            name=name,
             file=file,
             row_count=row_count,
             dimension=dimension,
         )
+        
+        if not name:
+            saved.name = f"job-{saved.id}"
+
+        saved.save()
         return saved
     
     def get_all_jobs_for_user(self, user: User | int):
@@ -53,3 +61,9 @@ class SavedJob(models.Model):
     
     objects = SavedJobManager()
     
+    def delete(self, *args, **kwargs):
+        
+        if os.path.isfile(self.file.path):
+            os.remove(self.file.path)
+        
+        return super().delete(*args, **kwargs)

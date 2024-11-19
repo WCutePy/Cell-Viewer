@@ -1511,8 +1511,8 @@ input:checked + .toggle-bg {
   height: 2.25rem;
 }
 
-.h-\[100rem\] {
-  height: 100rem;
+.h-\[130rem\] {
+  height: 130rem;
 }
 
 .h-full {
@@ -1888,6 +1888,10 @@ input:checked + .toggle-bg {
 
 .gap-6 {
   gap: 1.5rem;
+}
+
+.gap-1 {
+  gap: 0.25rem;
 }
 
 .space-x-1 > :not([hidden]) ~ :not([hidden]) {
@@ -2378,6 +2382,11 @@ input:checked + .toggle-bg {
 .py-3 {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+}
+
+.py-6 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 .py-8 {
