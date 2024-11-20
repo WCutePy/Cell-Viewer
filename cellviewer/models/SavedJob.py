@@ -46,7 +46,7 @@ class SavedJobManager(models.Manager):
         row_count, dimension = file_dimensions(df)
         dimension = f"{len(dimension[0])}x{len(dimension[1])}"
         
-        label_matrix_id = LabelMatrix.objects.create(request, *labels)
+        label_matrix = LabelMatrix.objects.create(request, *labels)
         
         saved = super().create(
             user_id=request.user.id,
@@ -54,7 +54,7 @@ class SavedJobManager(models.Manager):
             file=file,
             row_count=row_count,
             dimension=dimension,
-            label_matrix=label_matrix_id
+            label_matrix=label_matrix
         )
         
         if not name:
