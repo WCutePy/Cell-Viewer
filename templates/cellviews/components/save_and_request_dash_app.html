@@ -4,7 +4,7 @@
 <div class="flex flex-wrap ">
   <div class="w-full">
     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-        <form method="post" id='form' hx-encoding='multipart/form-data' hx-post='/dash_or_save' hx-target="#dash-embed" hx-include="#inputData">
+        <form method="post" id='form' hx-encoding='multipart/form-data' hx-include="#inputData">
 
             <div class="grid grid-cols-6 gap-6">
                 <div class="col-span-6 sm:col-span-3">
@@ -37,8 +37,14 @@
         
             <div class="grid grid-cols-6 gap-6">
                 <div class="col-span-6 sm:col-full">
-                    <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" type="submit" name="submit" value="save">Save all</button>
-                    <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" type="submit" name="submit" value="load">Load dashboard</button>
+                    <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" 
+                            type="submit" name="submit" value="save"
+                            hx-post='/save_job' hx-target="#dash-embed"
+                            >Save all</button>
+                    <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" 
+                            type="submit" name="submit" value="load"
+                            hx-post='/load_dash' hx-target="#dash-embed"
+                            >Load dashboard</button>
                 </div>
             </div>
         

@@ -38,16 +38,44 @@ def input_data(request):
     return render(request, "cellviews/components/save_and_request_dash_app.html", context)
 
 
-def dash_or_save(request):
+def load_dash(request):
     if request.method != "POST":
         return
     if "inputData" not in request.FILES:
         return
+    
+    file, name, labels = load_and_save_processing(request)
+    
+    request.session["celldash_df_data"] = file.open().read().decode("utf-8")
+    
+    # request.session["celldash_default_labels"] = default_labels
+    request.session["celldash_labels"] = labels
+    
+    return render(request, "cellviews/components/dash_embed.html")
+    
 
+def save_job(request):
+    if request.method != "POST":
+        return
+    if "inputData" not in request.FILES:
+        return
+    
+    file, name, labels = load_and_save_processing(request)
+    
+    SavedJob.objects.create(
+        request,
+        file,
+        name,
+        labels
+    )
+    return
+
+
+def load_and_save_processing(request):
     file = request.FILES["inputData"]
     name = request.POST.get("name")
     
-    default_rows = request.POST.get("default-rows").split(",,,") # this is to allow "," inside of the names.
+    default_rows = request.POST.get("default-rows").split(",,,")  # this is to allow "," inside of the names.
     default_cols = request.POST.get("default-cols").split(",,,")
     
     rows = [a if a else b for a, b in zip(request.POST.getlist("row"), default_rows)]
@@ -57,22 +85,4 @@ def dash_or_save(request):
     
     default_labels = (tuple(default_rows), tuple(default_cols))
     labels = (tuple(rows), tuple(cols), tuple(cells))
-    
-    if request.POST.get("submit") == "save":
-        
-        SavedJob.objects.create(
-            request,
-            file,
-            name,
-            labels
-        )
-        return
-    elif request.POST.get("submit") == "load":
-        request.session["celldash_df_data"] = file.open().read().decode("utf-8")
-        
-        # request.session["celldash_default_labels"] = default_labels
-        request.session["celldash_labels"] = labels
-        
-        return render(request, "cellviews/components/dash_embed.html")
-    
-    
+    return file, name, labels
