@@ -8,12 +8,7 @@ import polars as pl
 
 from cellviewer.models import file_path
 from cellviewer.models.LabelMatrix import LabelMatrix
-
-
-# Create your models here.
-
-
-
+from cellviewer.models.SavedFile import SavedFile
 
 
 def file_dimensions(df: pl.DataFrame) -> tuple[int, tuple[list[str], list[str]]]:
@@ -40,22 +35,35 @@ def file_dimensions(df: pl.DataFrame) -> tuple[int, tuple[list[str], list[str]]]
 
 
 class SavedJobManager(models.Manager):
-    def create(self, request, file: "InMemoryUploadedFile", name: str, labels: tuple[tuple[str]]):
-        df = pl.read_csv(file)
+    def create(self, request, files: list["InMemoryUploadedFile"], name: str, labels: tuple[tuple[str]]):
+        saved_files = []
+        first_dimension, next_dimension = (0, 0), (0, 0)
+        for file in files:
+            saved_file = SavedFile.objects.create(request, file)
+            
+            next_dimension = (saved_file.matrix_row_count, saved_file.matrix_col_count)
+            if next_dimension != first_dimension and first_dimension != (0, 0):
+                raise ValueError(f"DataFrames have different shapes\n"
+                                 f"first_dimension: {first_dimension}\n"
+                                 f"next_dimension: {next_dimension}"
+                                 )
+            first_dimension = next_dimension
+            saved_files.append(saved_file)
         
-        row_count, dimension = file_dimensions(df)
-        dimension = f"{len(dimension[0])}x{len(dimension[1])}"
-        
+        if (len(labels[0]), len(labels[1])) != first_dimension:
+            raise ValueError(f"The label and file content dimension does not match\ndimensions:"
+                             f"label: {(len(labels[0]), len(labels[1]))}\n"
+                             f"dimension: {first_dimension}"
+                             )
         label_matrix = LabelMatrix.objects.create(request, *labels)
         
         saved = super().create(
             user_id=request.user.id,
             name=name,
-            file=file,
-            row_count=row_count,
-            dimension=dimension,
+            dimension=saved_files[0].dimension,
             label_matrix=label_matrix
         )
+        saved.files.add(*saved_files)
         
         if not name:
             saved.name = f"job-{saved.id}"
@@ -72,17 +80,22 @@ class SavedJobManager(models.Manager):
 class SavedJob(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    file = models.FileField(upload_to=file_path)
-    date = models.DateTimeField(auto_now_add=True)
-    row_count = models.IntegerField()
-    dimension = models.CharField(max_length=100)
     
+    files = models.ManyToManyField(SavedFile, related_name='job_files')
+    
+    date = models.DateTimeField(auto_now_add=True)
+
+    dimension = models.CharField(max_length=100)
     label_matrix = models.ForeignKey(LabelMatrix, on_delete=models.PROTECT)
     
     objects = SavedJobManager()
     
     def delete(self, *args, **kwargs):
-        if os.path.isfile(self.file.path):
-            os.remove(self.file.path)
+        
+        for saved_file in self.files.all():
+            print(saved_file.id)
+            self.files.remove(saved_file)
+            saved_file.delete()
         
         return super().delete(*args, **kwargs)
+        

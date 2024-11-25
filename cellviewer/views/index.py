@@ -44,9 +44,9 @@ def load_dash(request):
     if "inputData" not in request.FILES:
         return
     
-    file, name, labels = load_and_save_processing(request)
+    files, name, labels = load_and_save_processing(request)
     
-    request.session["celldash_df_data"] = file.open().read().decode("utf-8")
+    request.session["celldash_df_data"] = files[0].open().read().decode("utf-8")
     
     # request.session["celldash_default_labels"] = default_labels
     request.session["celldash_labels"] = labels
@@ -60,11 +60,11 @@ def save_job(request):
     if "inputData" not in request.FILES:
         return
     
-    file, name, labels = load_and_save_processing(request)
+    files, name, labels = load_and_save_processing(request)
     
     SavedJob.objects.create(
         request,
-        file,
+        files,
         name,
         labels
     )
@@ -72,7 +72,7 @@ def save_job(request):
 
 
 def load_and_save_processing(request):
-    file = request.FILES["inputData"]
+    files = request.FILES.getlist("inputData")
     name = request.POST.get("name")
     
     default_rows = request.POST.get("default-rows").split(",,,")  # this is to allow "," inside of the names.
@@ -85,4 +85,4 @@ def load_and_save_processing(request):
     
     default_labels = (tuple(default_rows), tuple(default_cols))
     labels = (tuple(rows), tuple(cols), tuple(cells))
-    return file, name, labels
+    return files, name, labels

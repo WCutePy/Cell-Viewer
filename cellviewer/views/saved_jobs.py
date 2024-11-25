@@ -4,7 +4,7 @@ from cellviewer.models.SavedJob import SavedJob
 
 def saved_jobs(request):
     jobs = SavedJob.objects.get_all_jobs_for_user(request.user)
-    headers = ["id", "name", "date", "row_count", "dimension"]
+    headers = ["id", "name", "date", "dimension"]
     jobs = jobs.values(*headers)
     
     jobs = list(list(job.values()) for job in jobs)
@@ -26,8 +26,7 @@ def display_job(request, job_id: int):
     if job.user.id != request.user.id:
         return
     
-    print(job.file)
-    file = job.file
+    file = job.files.first().file
     label_matrix = job.label_matrix
     labels = (label_matrix.rows.split(",,,"),
               label_matrix.cols.split(",,,"),
