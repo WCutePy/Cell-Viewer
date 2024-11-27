@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 from time import time
 import polars as pl
 
-from cellviewer.models import file_path
-from cellviewer.models.LabelMatrix import LabelMatrix
+from apps.cellviewer.models import file_path
+from apps.cellviewer.models.LabelMatrix import LabelMatrix
 
 import hashlib
 

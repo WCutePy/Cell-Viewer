@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from cellviewer.models.SavedJob import SavedJob
+from apps.cellviewer.models.SavedJob import SavedJob
 
 
 def saved_jobs(request):

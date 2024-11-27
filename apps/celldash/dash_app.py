@@ -1,14 +1,7 @@
-from dash import Dash, dcc, html, dash_table, Input, Output, State, \
-    callback, no_update
+from dash import dcc, html
 import dash_bootstrap_components as dbc
-from celldash.callbacks.callbacks import *
-from pathlib import Path
-import uuid
-import pprint
 import os
 import shutil
-import pandas as pd
-from django_plotly_dash import DjangoDash
 
 
 def emtpy_dir(folder):
