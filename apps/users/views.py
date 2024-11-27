@@ -12,6 +12,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from apps.users.utils import user_filter
+from django.contrib.auth.decorators import login_not_required
+from django.utils.decorators import method_decorator
 
 # Create your views here.
 
@@ -20,6 +22,11 @@ class SignInView(LoginView):
     form_class = SigninForm
     template_name = "authentication/sign-in.html"
 
+
+@method_decorator(
+    login_not_required,
+    name="dispatch",
+)
 class SignUpView(CreateView):
     form_class = SignupForm
     template_name = "authentication/sign-up.html"
@@ -43,7 +50,6 @@ def signout_view(request):
     return redirect(reverse('signin'))
 
 
-@login_required(login_url='/users/signin/')
 def profile(request):
     profile = get_object_or_404(Profile, user=request.user)
     if request.method == 'POST':
