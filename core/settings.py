@@ -53,12 +53,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "home",
-    "apps.common",
     "apps.users",
-    "apps.api",
     
-    "cellviewer",
-    "celldash",
+    "apps.cellviewer",
+    "apps.celldash",
     
     "django_plotly_dash.apps.DjangoPlotlyDashConfig",
     'django_components',

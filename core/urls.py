@@ -18,20 +18,17 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from django.views.static import serve
 
-from celldash import dash_app
-
 urlpatterns = [
-    path("", include("cellviewer.urls")),
+    path("", include("apps.cellviewer.urls")),
     
     path('django_plotly_dash/', include('django_plotly_dash.urls')),
     
     
     path("admin/", admin.site.urls),
-    path("api/", include("apps.api.urls")),
     path("users/", include("apps.users.urls")),
 
     path('api/docs/schema', SpectacularAPIView.as_view(), name='schema'),

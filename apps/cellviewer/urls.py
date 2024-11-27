@@ -1,6 +1,6 @@
 from django.urls import path
 
-from cellviewer.views import index, saved_jobs
+from apps.cellviewer.views import index, saved_jobs
 
 
 urlpatterns = [

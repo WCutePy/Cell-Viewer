@@ -1,6 +1,6 @@
 import polars as pl
 from django.shortcuts import render
-from cellviewer.models.SavedJob import SavedJob, file_dimensions
+from apps.cellviewer.models.SavedJob import SavedJob, file_dimensions
 
 
 def index(request):

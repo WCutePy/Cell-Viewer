@@ -1,14 +1,11 @@
-import os
 from string import digits, ascii_letters
 
 from django.db import models
 from django.contrib.auth.models import User
-from time import time
 import polars as pl
 
-from cellviewer.models import file_path
-from cellviewer.models.LabelMatrix import LabelMatrix
-from cellviewer.models.SavedFile import SavedFile
+from apps.cellviewer.models.LabelMatrix import LabelMatrix
+from apps.cellviewer.models.SavedFile import SavedFile
 
 
 def file_dimensions(df: pl.DataFrame) -> tuple[int, tuple[list[str], list[str]]]:
