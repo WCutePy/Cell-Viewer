@@ -7,7 +7,6 @@ import uuid
 import pprint
 import os
 import shutil
-import dash_uploader as du
 import pandas as pd
 from django_plotly_dash import DjangoDash
 
@@ -23,16 +22,6 @@ def emtpy_dir(folder):
                 shutil.rmtree(file_path)
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-
-def get_upload_component(id):
-    emtpy_dir(UPlOAD_FOLDER_ROOT)
-    return du.Upload(
-        id=id,
-        max_file_size=3800,  # in Mb
-        filetypes=['csv', 'gz'],
-        upload_id=uuid.uuid1(),  # Unique session id
-    )
 
 
 app.layout = html.Div([

@@ -16,7 +16,6 @@ django_components==0.102
 dash==2.18.1
 django_plotly_dash==2.4.3
 dash_bootstrap_components==1.6.0
-dash_uploader==0.7.0a1
 packaging==21.3
 
 # Services
