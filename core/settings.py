@@ -56,9 +56,6 @@ INSTALLED_APPS = [
     "apps.common",
     "apps.users",
     "apps.api",
-    "apps.charts", 
-    "apps.tables",
-    "apps.tasks",
     
     "cellviewer",
     "celldash",
@@ -130,7 +127,7 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 WSGI_APPLICATION = "core.wsgi.application"
 ASGI_APPLICATION = "core.asgi.application"
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
+DATA_UPLOAD_MAX_MEMORY_SIZE = 300000000
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
