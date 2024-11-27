@@ -3,7 +3,6 @@ from dash import Dash, dcc, html, Input, Output, \
     callback, no_update, State
 from pathlib import Path
 from io import StringIO
-# import dash_uploader as du
 import pandas as pd
 import json
 import os
@@ -28,8 +27,6 @@ app = DjangoDash(
     external_stylesheets=[dbc.themes.BOOTSTRAP],
     # suppress_callback_exceptions=True,
 )
-
-# du.configure_upload(app, UPlOAD_FOLDER_ROOT)
 
 # only load columns of interest
 use_cols = ["Well", "Site", "Cell", "OCT4", "SOX17"]
