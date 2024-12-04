@@ -20,6 +20,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+import apps.celldash.dash_app  # noqa: F401  This needs to stay imported, or the dash app may not be able to be found!!
+
 from django.views.static import serve
 
 urlpatterns = [

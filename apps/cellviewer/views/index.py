@@ -1,5 +1,5 @@
 import polars as pl
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 from apps.cellviewer.models.SavedJob import SavedJob, file_dimensions
 
 
@@ -68,7 +68,7 @@ def save_job(request):
         name,
         labels
     )
-    return
+    return HttpResponse()
 
 
 def load_and_save_processing(request):
