@@ -72,7 +72,7 @@ class UserPasswordChangeForm(PasswordChangeForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        exclude = ('user', 'role', 'avatar',)
+        exclude = ('user', 'role', 'avatar', 'storage_space_in_gb')
 
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)

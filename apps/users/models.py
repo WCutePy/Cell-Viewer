@@ -18,6 +18,8 @@ class Profile(models.Model):
     address   = models.CharField(max_length=255, null=True, blank=True)
     phone     = models.CharField(max_length=255, null=True, blank=True)
     avatar    = models.ImageField(upload_to='avatar', null=True, blank=True)
+    
+    storage_space_in_gb = models.FloatField(default=5)
 
     def __str__(self):
         return self.user.username

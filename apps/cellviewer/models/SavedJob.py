@@ -6,6 +6,7 @@ import polars as pl
 
 from apps.cellviewer.models.LabelMatrix import LabelMatrix
 from apps.cellviewer.models.SavedFile import SavedFile
+from django.db import transaction
 
 
 def file_dimensions(df: pl.DataFrame) -> tuple[int, tuple[list[str], list[str]]]:
@@ -32,46 +33,113 @@ def file_dimensions(df: pl.DataFrame) -> tuple[int, tuple[list[str], list[str]]]
 
 
 class SavedJobManager(models.Manager):
+    
+    @transaction.atomic
     def create(self, request, files: list["InMemoryUploadedFile"], name: str, labels: tuple[tuple[str]]):
-        saved_files = []
+        """
+        Saves a "job" in the database. This manages the creation of all aspects of it.
+        
+        The related aspects:
+            Itself
+            The files which are stored in SavedFile
+            The LabelMatrix
+        
+        The create is atomic to ensure that if anything goes wrong,
+        all changes will be reverted. This however does not revert
+        the saving of files to disk using FileField.
+        It is thereby possible for an orphaned file to occur.
+        Currently nothing is robustly in place
+        to ensure these do not occur. This would require an aggresive
+        check after each create when an error occurs,
+        or a scheduled cronjob.
+        Currently the saving of the files to disk is delayed as far
+        as possible until .save() is called.
+        is called on the SavedFile objects, the chance for an orphan
+        to occur is minimalized.
+        
+        There are multiple checks and errors the create can throw.
+        
+        If the files have different dimensions from each other
+        a ValueError will be raised. This will cancel the creation.
+        
+        If the files and LabelMatrix have different dimensions
+        from each other a ValueError will be raised.
+        This will cancel the creation. It is not known if users
+        can trigger this error through intended use.
+        
+        SavedFile throws a PermissionError if there is not enough
+        space available to the user to write the file.
+        
+        Currently, any creates that happen in the middle if an error is raised remain
+        There will be objects created that are "orphaned"
+        Args:
+            request:
+            files:
+            name:
+            labels:
+
+        Returns:
+
+        """
+        to_save_files = []
         first_dimension, next_dimension = (0, 0), (0, 0)
+        
+        current_users_size_in_b = SavedJob.objects.get_users_used_file_storage(request.user)
+        
         for file in files:
-            saved_file = SavedFile.objects.create(request, file)
+            initialized_file_object, current_users_size_in_b = SavedFile.create(request, file, current_users_size_in_b)
             
-            next_dimension = (saved_file.matrix_row_count, saved_file.matrix_col_count)
+            next_dimension = (initialized_file_object.matrix_row_count, initialized_file_object.matrix_col_count)
             if next_dimension != first_dimension and first_dimension != (0, 0):
                 raise ValueError(f"DataFrames have different shapes\n"
                                  f"first_dimension: {first_dimension}\n"
                                  f"next_dimension: {next_dimension}"
                                  )
+            
+            if (len(labels[0]), len(labels[1])) != next_dimension:
+                raise ValueError(f"The label and file content dimension does not match\ndimensions:"
+                                 f"label: {(len(labels[0]), len(labels[1]))}\n"
+                                 f"dimension: {first_dimension}"
+                                 )
+            
             first_dimension = next_dimension
-            saved_files.append(saved_file)
-        
-        if (len(labels[0]), len(labels[1])) != first_dimension:
-            raise ValueError(f"The label and file content dimension does not match\ndimensions:"
-                             f"label: {(len(labels[0]), len(labels[1]))}\n"
-                             f"dimension: {first_dimension}"
-                             )
+            to_save_files.append(initialized_file_object)
+
+
         label_matrix = LabelMatrix.objects.create(request, *labels)
         
-        saved = super().create(
+        saved_job = super().create(
             user_id=request.user.id,
             name=name,
-            dimension=saved_files[0].dimension,
+            dimension=to_save_files[0].dimension,
             label_matrix=label_matrix
         )
-        saved.files.add(*saved_files)
         
         if not name:
-            saved.name = f"job-{saved.id}"
+            saved_job.name = f"job-{saved_job.id}"
         
-        saved.save()
-        return saved
+        saved_job.save()
+        
+        for file in to_save_files:
+            file.save()
+        saved_job.files.add(*to_save_files)
+        
+        return saved_job
     
     def get_all_jobs_for_user(self, user: User | int):
         if isinstance(user, User):
             user = user.id
         return self.filter(user_id=user)
+    
+    def get_users_used_file_storage(self, user: User | int):
+        if isinstance(user, User):
+            user = user.id
+        unique_files = self.filter(user_id=user).values("files").distinct()
+        storage = SavedFile.objects.filter(id__in=unique_files) \
+            .aggregate(models.Sum("storage_space_in_b"))["storage_space_in_b__sum"]
+        if storage is None:
+            storage = 0
+        return storage
 
 
 class SavedJob(models.Model):
@@ -81,18 +149,16 @@ class SavedJob(models.Model):
     files = models.ManyToManyField(SavedFile, related_name='job_files')
     
     date = models.DateTimeField(auto_now_add=True)
-
+    
     dimension = models.CharField(max_length=100)
     label_matrix = models.ForeignKey(LabelMatrix, on_delete=models.PROTECT)
     
     objects = SavedJobManager()
     
     def delete(self, *args, **kwargs):
-        
         for saved_file in self.files.all():
             print(saved_file.id)
             self.files.remove(saved_file)
             saved_file.delete()
         
         return super().delete(*args, **kwargs)
-        
