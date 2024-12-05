@@ -4,13 +4,8 @@ from string import digits, ascii_letters
 
 from django.db import models
 from django.contrib.auth.models import User
-from time import time
+from time import time, strftime
 import polars as pl
-
-from apps.cellviewer.models import file_path
-from apps.cellviewer.models.LabelMatrix import LabelMatrix
-from apps.cellviewer.models import SavedJob
-
 
 import hashlib
 
@@ -41,6 +36,10 @@ def file_dimensions(df: pl.DataFrame) -> tuple[int, tuple[list[str], list[str]]]
     return rows, (letters, numbers)
 
 
+def saved_file_path_func(instance, filename) -> str:
+    return strftime(f"saved_files/%Y/%m/{filename}_{int(time())}")
+
+
 class SavedFileManager(models.Manager):
     
     def get_all_for_user(self, user: User | int):
@@ -56,7 +55,7 @@ class SavedFileManager(models.Manager):
 
 class SavedFile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    file = models.FileField(upload_to=file_path)
+    file = models.FileField(upload_to=saved_file_path_func)
     storage_space_in_b = models.IntegerField()
     row_count = models.IntegerField()
     
@@ -139,12 +138,29 @@ class SavedFile(models.Model):
 
         return instance, new_size
     
+    @classmethod
+    def delete_by_file_path(cls, file_path):
+        """
+        Handles the deletion of an individual file.
+        
+        Currently, nothing is implemented to handle
+        the failure to delete a file as a part of this function.
+        It makes the assumption that the attempt to delete a file
+        will always succeed on Unix based operating systems.
+        Args:
+            file_path:
+
+        Returns:
+
+        """
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+        else:
+            raise FileNotFoundError
+    
     def delete(self, *args, **kwargs):
         if self.job_files.all().exists():
             return
             
-        if os.path.isfile(self.file.path):
-            os.remove(self.file.path)
-        else:
-            pass
+        self.delete_by_file_path(self.file.path)
         return super().delete(*args, **kwargs)

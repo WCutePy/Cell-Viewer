@@ -56,6 +56,8 @@ class SavedJobManager(models.Manager):
         as possible until .save() is called.
         is called on the SavedFile objects, the chance for an orphan
         to occur is minimalized.
+        In theory this should only be possible with an unexpected
+        crash or forced shutdown of the system.
         
         There are multiple checks and errors the create can throw.
         
