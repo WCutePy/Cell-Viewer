@@ -45,6 +45,7 @@ class LabelMatrixManager(models.Manager):
 class LabelMatrix(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     public = models.BooleanField()
+    keep_when_unused = models.BooleanField(default=False)
     row_count = models.IntegerField()
     col_count = models.IntegerField()
     rows = models.TextField()
@@ -52,3 +53,12 @@ class LabelMatrix(models.Model):
     cells = models.TextField()
     
     objects = LabelMatrixManager()
+    
+    def delete(self, *args, **kwargs):
+        if self.keep_when_unused is True:
+            return None
+        
+        if self.job_label.all().count() > 2:
+            return None
+        
+        return super().delete(*args, **kwargs)

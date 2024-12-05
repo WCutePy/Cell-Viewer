@@ -148,12 +148,13 @@ class SavedJob(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     
-    files = models.ManyToManyField(SavedFile, related_name='job_files')
+    files = models.ManyToManyField(SavedFile, related_name="job_files")
     
     date = models.DateTimeField(auto_now_add=True)
     
     dimension = models.CharField(max_length=100)
-    label_matrix = models.ForeignKey(LabelMatrix, on_delete=models.PROTECT)
+    label_matrix = models.ForeignKey(LabelMatrix, on_delete=models.SET_NULL,
+                                     related_name="job_label", null=True)
     
     objects = SavedJobManager()
     
@@ -162,5 +163,7 @@ class SavedJob(models.Model):
             print(saved_file.id)
             self.files.remove(saved_file)
             saved_file.delete()
+        
+        self.label_matrix.delete()
         
         return super().delete(*args, **kwargs)
