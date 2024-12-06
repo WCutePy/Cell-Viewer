@@ -35,7 +35,7 @@ def file_dimensions(df: pl.DataFrame) -> tuple[int, tuple[list[str], list[str]]]
 class SavedJobManager(models.Manager):
     
     @transaction.atomic
-    def create(self, request, files: list["InMemoryUploadedFile"], name: str, labels: tuple[tuple[str]]):
+    def create(self, request, files: list["InMemoryUploadedFile"], name: str, labels: tuple[tuple[str]], label_matrix_name: str):
         """
         Saves a "job" in the database. This manages the creation of all aspects of it.
         
@@ -75,6 +75,7 @@ class SavedJobManager(models.Manager):
         Currently, any creates that happen in the middle if an error is raised remain
         There will be objects created that are "orphaned"
         Args:
+            label_matrix_name:
             request:
             files:
             name:
@@ -107,8 +108,9 @@ class SavedJobManager(models.Manager):
             first_dimension = next_dimension
             to_save_files.append(initialized_file_object)
 
-
-        label_matrix = LabelMatrix.objects.create(request, *labels)
+        if not label_matrix_name and name:
+            label_matrix_name = f"{name}_annotation"
+        label_matrix = LabelMatrix.objects.create(request, *labels, label_matrix_name)
         
         saved_job = super().create(
             user_id=request.user.id,

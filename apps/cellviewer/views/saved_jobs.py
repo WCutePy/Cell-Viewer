@@ -27,10 +27,7 @@ def display_job(request, job_id: int):
         return
     
     file = job.files.first().file
-    label_matrix = job.label_matrix
-    labels = (label_matrix.rows.split(",,,"),
-              label_matrix.cols.split(",,,"),
-              label_matrix.cells.split(",,,"))
+    labels = job.label_matrix.get_labels
     request.session["celldash_df_data"] = file.open().read().decode("utf-8")
     request.session["celldash_labels"] = labels
     return render(request, "cellviews/display_saved_job.html")
