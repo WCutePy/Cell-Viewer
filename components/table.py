@@ -1,5 +1,6 @@
 from django_components import Component, register
 
+
 @register("table")
 class Table(Component):
     def get_context_data(self, title):
@@ -30,4 +31,4 @@ class Table(Component):
         </div>
       </div>
     </div>
-"""
+    """

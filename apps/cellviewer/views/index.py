@@ -1,6 +1,8 @@
 import polars as pl
 from django.shortcuts import render, HttpResponse
 from apps.cellviewer.models.SavedJob import SavedJob, file_dimensions
+from apps.cellviewer.models.LabelMatrix import LabelMatrix
+from components.label_matrix_input_fields import LabelMatrixInputFieldsComponent
 
 
 def index(request):
@@ -18,21 +20,24 @@ def input_data(request):
     
     file = request.FILES["inputData"]
     
-    # needs removal
-    # file = "240306-EXP3-2-plate_1output.csv"
-    
     df = pl.read_csv(file)
     
     header = df.columns
     
-    _, dimensions = file_dimensions(df)
+    _, (rows, cols) = file_dimensions(df)
+    
+    available_labels = LabelMatrix.objects.get_all_same_size(request.user, len(rows), len(cols))
+    print(available_labels)
     
     context = {
         "header": header,
         "table_data": df.head(5).rows(),
-        "dimensions": dimensions,
-        "default_rows": ",,,".join(dimensions[0]),
-        "default_cols": ",,,".join(dimensions[1]),
+        "available_labels": available_labels,
+        "row_names": rows,
+        "col_names": cols,
+        "cell_names": [[f"{row}_{col}" for col in cols] for row in rows],
+        "default_rows": ",,,".join(rows),
+        "default_cols": ",,,".join(cols),
     }
     
     return render(request, "cellviews/components/save_and_request_dash_app.html", context)
@@ -61,12 +66,14 @@ def save_job(request):
         return
     
     files, name, labels = load_and_save_processing(request)
+    label_matrix_name = request.POST.get("label-layout-name")
     
     SavedJob.objects.create(
         request,
         files,
         name,
-        labels
+        labels,
+        label_matrix_name
     )
     return HttpResponse()
 
@@ -86,3 +93,18 @@ def load_and_save_processing(request):
     default_labels = (tuple(default_rows), tuple(default_cols))
     labels = (tuple(rows), tuple(cols), tuple(cells))
     return files, name, labels
+
+
+def load_stored_label_matrix(request):
+    matrix_id = int(request.POST.get("label-select"))
+    
+    matrix = LabelMatrix.objects.get(pk=matrix_id)
+    rows, cols, cells = matrix.get_labels
+    matrix_name = matrix.matrix_name
+    cells = [cells[i * len(cols):(i + 1) * len(cols)] for i in range(len(rows))]
+    
+    html_content = LabelMatrixInputFieldsComponent.render(
+        args=[matrix_name, rows,cols,cells]
+    )
+    
+    return HttpResponse(html_content)
