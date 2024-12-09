@@ -162,7 +162,6 @@ class SavedJob(models.Model):
     
     def delete(self, *args, **kwargs):
         for saved_file in self.files.all():
-            print(saved_file.id)
             self.files.remove(saved_file)
             saved_file.delete()
         

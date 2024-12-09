@@ -5,7 +5,7 @@ from apps.cellviewer.views import index, saved_jobs
 
 urlpatterns = [
     path("", index.index, name="index"),
-    path("input_data", index.input_data),
+    path("input_data", index.index_follow_up_input),
     path("load_dash", index.load_dash),
     path("load_stored_label_matrix", index.load_stored_label_matrix),
     path("save_job", index.save_job),
