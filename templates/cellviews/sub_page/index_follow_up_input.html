@@ -26,7 +26,7 @@
             <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" 
                     type="submit" name="submit" value="load"
                     hx-post='/load_stored_label_matrix' hx-target="#label-matrix-input-fields"
-            >Display premade annotation</button>
+            >Load premade annotation</button>
             
             <div id="label-matrix-input-fields">
                 {% component "label_matrix_input_fields" matrix_name="Annotation name" row_names=row_names col_names=col_names cell_names=cell_names %}
@@ -41,7 +41,8 @@
                 <div class="col-span-6 sm:col-full">
                     <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" 
                             type="submit" name="submit" value="save"
-                            hx-post='/save_job' hx-target=""
+                            hx-post='/save_job' hx-target="#inner_modal"
+                            onclick="response_modal.showModal()"
                             >Save annotation and input file</button>
                     <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" 
                             type="submit" name="submit" value="load"
@@ -51,6 +52,12 @@
             </div>
         
         </form>
+    
+        <dialog id="response_modal" class="rounded-lg">
+            <div class="relative w-full max-w-2xl max-h-full rounded-lg">
+                <div id="inner_modal"></div>
+            </div>
+        </dialog>
     
     </div>
   </div>

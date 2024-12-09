@@ -2,7 +2,8 @@ import polars as pl
 from django.shortcuts import render, HttpResponse
 from apps.cellviewer.models.SavedJob import SavedJob, file_dimensions
 from apps.cellviewer.models.LabelMatrix import LabelMatrix
-from components.label_matrix_input_fields import LabelMatrixInputFieldsComponent
+from apps.cellviewer.components.label_matrix_input_fields import LabelMatrixInputFieldsComponent
+from apps.cellviewer.components.response_modal import ResponseModal
 
 
 def index(request):
@@ -12,7 +13,7 @@ def index(request):
     return render(request, "cellviews/index.html", context)
 
 
-def input_data(request):
+def index_follow_up_input(request):
     if request.method != "POST":
         return
     if "inputData" not in request.FILES:
@@ -27,7 +28,6 @@ def input_data(request):
     _, (rows, cols) = file_dimensions(df)
     
     available_labels = LabelMatrix.objects.get_all_same_size(request.user, len(rows), len(cols))
-    print(available_labels)
     
     context = {
         "header": header,
@@ -40,7 +40,7 @@ def input_data(request):
         "default_cols": ",,,".join(cols),
     }
     
-    return render(request, "cellviews/components/save_and_request_dash_app.html", context)
+    return render(request, "cellviews/sub_page/index_follow_up_input.html", context)
 
 
 def load_dash(request):
@@ -56,7 +56,7 @@ def load_dash(request):
     # request.session["celldash_default_labels"] = default_labels
     request.session["celldash_labels"] = labels
     
-    return render(request, "cellviews/components/dash_embed.html")
+    return render(request, "cellviews/sub_page/dash_embed.html")
     
 
 def save_job(request):
@@ -68,14 +68,20 @@ def save_job(request):
     files, name, labels = load_and_save_processing(request)
     label_matrix_name = request.POST.get("label-layout-name")
     
-    SavedJob.objects.create(
+    saved = SavedJob.objects.create(
         request,
         files,
         name,
         labels,
         label_matrix_name
     )
-    return HttpResponse()
+    
+    html_content = ResponseModal.render(
+        args=("Saved experiment with configuration successfully",
+              f"You can find the saved version at <a href='http://127.0.0.1:8000/saved_jobs/{saved.id}'>saved job</a>")
+    )
+    
+    return HttpResponse(html_content)
 
 
 def load_and_save_processing(request):
@@ -104,7 +110,7 @@ def load_stored_label_matrix(request):
     cells = [cells[i * len(cols):(i + 1) * len(cols)] for i in range(len(rows))]
     
     html_content = LabelMatrixInputFieldsComponent.render(
-        args=[matrix_name, rows,cols,cells]
+        args=(matrix_name, rows,cols,cells)
     )
     
     return HttpResponse(html_content)
