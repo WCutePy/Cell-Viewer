@@ -20,10 +20,12 @@
         {% fill "body" %}
           {% for line in jobs %}
             <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
-              {% for element in line|slice:"1:" %}
+              {% for element in line|slice:"2:" %}
                   <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     {% if forloop.counter0 == 0 %}
                       <a href="saved_jobs/{{ line.0 }}" class="text-sm mb-0">{{ element }}</a>
+                    {% elif forloop.counter0 == 1 %}
+                      <a href="annotation/{{ line.1 }}" class="text-sm mb-0">{{ element }}</a>
                     {% else %}
                       <p class="text-sm mb-0">{{ element }}</p>
                     {% endif %}

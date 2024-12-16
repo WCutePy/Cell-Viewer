@@ -9,7 +9,7 @@ def saved_annotations_page(request):
     fields = ["id", "matrix_name", "dimension_string", "public",
                "keep_when_unused"]
     headers = ["name", "dimension", "publicly available", "will remain if unused"]
-    annotations = list(annotations.values_list(*fields))
+    annotations = (annotations.values_list(*fields))
     
     context = {
         "header": headers,
