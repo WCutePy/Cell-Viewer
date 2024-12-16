@@ -26,7 +26,7 @@ def annotation_page(request, annotation_id: int):
         return
     
     rows, cols, cells = annotation.get_labels_with_2d_cells
-    
+
     context = {
         "annotation_name": annotation.matrix_name,
         "row_names": rows,
@@ -45,8 +45,10 @@ def edit_annotation(request, annotation_id: int):
     if annotation.created_by.id != request.user.id:
         return
     
-    name = request.POST.get("name")
+    name = request.POST.get("label-layout-name")
     _, labels = load_labels_from_request(request)
+    
+    print(name)
     
     keep_when_unused = request.POST.get('keep_when_unused') is not None
     public = request.POST.get('public') is not None

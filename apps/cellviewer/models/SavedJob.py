@@ -90,7 +90,8 @@ class SavedJobManager(models.Manager):
         current_users_size_in_b = SavedJob.objects.get_users_used_file_storage(request.user)
         
         for file in files:
-            initialized_file_object, current_users_size_in_b = SavedFile.create(request, file, current_users_size_in_b)
+            initialized_file_object, current_users_size_in_b = (
+                SavedFile.create(request, file, current_users_size_in_b))
             
             next_dimension = (initialized_file_object.matrix_row_count, initialized_file_object.matrix_col_count)
             if next_dimension != first_dimension and first_dimension != (0, 0):

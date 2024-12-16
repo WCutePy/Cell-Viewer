@@ -181,8 +181,6 @@ def index_file_preprocess_checking(request):
         
     for file in request.FILES.getlist("inputData", []):
         header = file.file.readline().decode("utf-8").strip().split(",")
-        print(header)
-        print(header)
         if header[:3] != ["Well", "Site", "Cell"]:
             response_title = "Wrong file header"
             response_text += ("The file header does not start with Well,Site,"
