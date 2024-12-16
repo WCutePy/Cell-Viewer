@@ -17,10 +17,9 @@
               
             <form id='form' hx-encoding='multipart/form-data' hx-post='/input_data' hx-target="#dash-requester"
             >
-              <input type='file' id="inputData" name="inputData">
-              <button>
-                Upload
-              </button>
+              <input required type='file' id="inputData" name="inputData">
+                <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                >Continue to next step</button>
 {#              <progress id='progress' value='0' max='100'></progress>#}
             </form>
           </div>
