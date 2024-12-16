@@ -10,7 +10,7 @@ urlpatterns = [
     path("load_dash", index.load_dash),
     path("load_stored_label_matrix", index.load_stored_label_matrix),
     path("save_job", index.save_job),
-    path("saved_jobs", saved_jobs.saved_jobs),
+    path("saved_jobs", saved_jobs.saved_jobs, name="saved_jobs"),
     path("saved_jobs/<int:job_id>/", saved_jobs.display_job),
     path("delete_job/<int:job_id>/", saved_jobs.delete_job),
     path("annotations", annotations.saved_annotations_page),

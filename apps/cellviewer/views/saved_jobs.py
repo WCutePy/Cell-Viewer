@@ -8,22 +8,32 @@ def saved_jobs(request):
     To be able to display the job and link to it, but not display the
     id to the user as this adds no value,
     the template iterates over parts of the jobs
-    list. This is a bit convoluted but adds simplicity to the template.
+    list. This is a bit convoluted but adds simplicity to the template itself.
+    
+    so id matches with name
+    label_matrix_id matches with label_matrix__matrix_name
+    
+    and every other field just iterates normally
     Args:
         request:
 
     Returns:
 
     """
-    jobs = SavedJob.objects.get_all_jobs_for_user(request.user).select_related("job_label")
-    headers = ["id", "name", "date", "dimension"]
-    jobs = jobs.values(*headers)
+    jobs = SavedJob.objects.get_all_jobs_for_user(request.user).select_related("label_matrix")
+    fields = ["id", "label_matrix_id", "name", "label_matrix__matrix_name", "date", "dimension"]
+    headers = ["name", "annotation", "date", "dimension", "loi"]
+    jobs = jobs.values(*fields)
+    print(jobs)
     
-    jobs = list(list(job.values()) for job in jobs[::-1])
+    data = (
+        list(job.values())
+        for job in jobs[::-1]
+    )
     
     context = {
-        "header": headers[1:],
-        'jobs': jobs,
+        "header": headers,
+        'jobs': data,
         'segment': 'stored',
     }
     return render(request, "cellviews/saved-jobs.html", context)
@@ -56,4 +66,4 @@ def delete_job(request, job_id: int):
 
     job.delete()
     
-    return redirect(saved_jobs)
+    return redirect("cellviewer:saved_jobs")
