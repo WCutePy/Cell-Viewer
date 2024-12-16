@@ -36,9 +36,9 @@ class ResponseModal(Component):
             </div>
         </div>
         
-        <script>
-            htmx.onLoad(function(elt){
-                document.getElementById('response_spinner').classList.add("hidden");
-            })
-        </script>
+                    <script>
+                        htmx.onLoad(function(elt){
+                            document.getElementById('response_spinner').classList.add("hidden");
+                        })
+                    </script>
     """

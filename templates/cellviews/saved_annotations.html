@@ -1,0 +1,45 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<main>
+  <div class="px-4 pt-6">
+      
+<div class="flex flex-wrap ">
+  <div class="w-full">
+      
+      {% component "table" title="Your saved annotations" %}
+        {% fill "header" %}
+          {% for title in header %}
+            <th class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">{{ title }}</th>
+          {% endfor %}
+        {% endfill %}
+          
+        {% fill "body" %}
+          {% for line in jobs %}
+            <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
+              {% for element in line|slice:"1:" %}
+                  <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    {% if forloop.counter0 == 0 %}
+                      <a href="annotation/{{ line.0 }}" class="text-sm mb-0">{{ element }}</a>
+                    {% else %}
+                      <p class="text-sm mb-0">{{ element }}</p>
+                    {% endif %}
+                  </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+          
+        {% endfill %}
+          
+      {% endcomponent %}
+  
+  </div>
+</div>
+
+</div>
+</main>
+    
+{% endblock content %}
+

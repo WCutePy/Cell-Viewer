@@ -3,11 +3,23 @@ from apps.cellviewer.models.SavedJob import SavedJob
 
 
 def saved_jobs(request):
-    jobs = SavedJob.objects.get_all_jobs_for_user(request.user)
+    """
+    Gets all of a user jobs and displays them in a table.
+    To be able to display the job and link to it, but not display the
+    id to the user as this adds no value,
+    the template iterates over parts of the jobs
+    list. This is a bit convoluted but adds simplicity to the template.
+    Args:
+        request:
+
+    Returns:
+
+    """
+    jobs = SavedJob.objects.get_all_jobs_for_user(request.user).select_related("job_label")
     headers = ["id", "name", "date", "dimension"]
     jobs = jobs.values(*headers)
     
-    jobs = list(list(job.values()) for job in jobs)
+    jobs = list(list(job.values()) for job in jobs[::-1])
     
     context = {
         "header": headers[1:],
