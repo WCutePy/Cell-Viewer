@@ -105,7 +105,8 @@ class LabelMatrix(models.Model):
         self.rows = rows_str
         self.cols = cols_str
         self.cells = cells_str
-        self.label_matrix_name = label_matrix_name
+        if label_matrix_name:
+            self.matrix_name = label_matrix_name
         self.keep_when_unused = keep_when_unused
         self.public = public
         

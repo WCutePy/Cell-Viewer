@@ -20,7 +20,7 @@ class LabelMatrixInputFieldsComponent(Component):
     <div class="grid grid-cols-6 gap-6">
         <div class="col-span-6 sm:col-span-3">
             <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Annotation name</label>
-            <input type="text" name="label-layout-name" maxlength="255" placeholder="{{ matrix_name }}" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" id="label-layout-name">
+            <input type="text" name="label-layout-name" maxlength="255" value="{{ matrix_name }}" placeholder="Annotation name" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" id="label-layout-name">
         </div>
     </div>
     
