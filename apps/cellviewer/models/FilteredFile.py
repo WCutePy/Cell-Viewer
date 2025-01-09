@@ -1,5 +1,6 @@
 from functools import reduce
 
+import pandas as pd
 import polars as pl
 from django.db import models
 
@@ -25,6 +26,9 @@ class FilteredFile(models.Model):
     The substance_thresholds as filter can be applied
     differently to each file.
     
+    This is currently used as an interface for methods
+    that use an individual file.
+    
     """
     
     job = models.ForeignKey(SavedJob, on_delete=models.CASCADE)
@@ -41,7 +45,12 @@ class FilteredFile(models.Model):
         return [float(i) for i in
                 self.substance_thresholds.split(";")]
     
-    def generate_filtered_polars_dataframe(self) -> pl.DataFrame:
+    def load_polars_dataframe(self) -> pl.DataFrame:
+        file = self.saved_file.file
+        
+        return pl.read_csv(file)
+    
+    def generate_filtered_polars_dataframe(self, df=None) -> pl.DataFrame:
         """
         Generates a polars DataFrame applying the filters of each
         threshold.
@@ -52,18 +61,53 @@ class FilteredFile(models.Model):
         Returns: pl.DataFrame
 
         """
-        file = self.saved_file.file
-        
-        data = pl.read_csv(file)
+        if df is None:
+            df = self.load_polars_dataframe()
         
         substance_thresholds = self.get_substance_thresholds_as_list
         
         if any(i != 0 for i in substance_thresholds):
             conditions = []
             for i, val in enumerate(substance_thresholds):
-                col_name = data.columns[i + 3]
+                col_name = df.columns[i + 3]
                 conditions.append(pl.col(col_name) >= val)
             combined_conditions = reduce(lambda a, b: a & b, conditions)
-            data = data.filter(combined_conditions)
-        return data
+            df = df.filter(combined_conditions)
+        return df
     
+    def generate_well_count_matrix(self, df=None):
+        """
+        Returns a cell count matrix representing the cell counts in
+        each well in the physical plate where cells are grown.
+        """
+        if df is None:
+            df = self.load_polars_dataframe()
+        
+        well_counts = df.group_by("Well").count().to_pandas()
+
+        well_counts["row"] = [well[0] for well in well_counts["Well"]]
+        well_counts["cols"] = [well[1:] for well in well_counts["Well"]]
+        matrix_well_counts = well_counts.pivot(index="row", columns="cols",
+                                               values="count")
+        matrix_well_counts.fillna(0, inplace=True)
+
+        return matrix_well_counts
+    
+    @staticmethod
+    def generate_well_count_percent(well_count_matrix, filtered_well_count_matrix):
+        return (100 * filtered_well_count_matrix / well_count_matrix).fillna(0)
+    
+    def get_well_count_and_well_count_percent(self):
+        df = self.load_polars_dataframe()
+        
+        df_filtered = self.generate_filtered_polars_dataframe(df)
+        
+        well_count_matrix = self.generate_well_count_matrix(df)
+        
+        filtered_well_count_matrix = self.generate_well_count_matrix(
+            df_filtered)
+        
+        well_count_matrix_percent = self.generate_well_count_percent(
+            well_count_matrix, filtered_well_count_matrix)
+        
+        return well_count_matrix, well_count_matrix_percent
