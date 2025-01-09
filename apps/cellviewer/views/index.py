@@ -1,6 +1,9 @@
+from typing import Any
+
 import polars as pl
 from django.shortcuts import render, HttpResponse
-from apps.cellviewer.models.SavedJob import SavedJob, file_dimensions
+from apps.cellviewer.models.SavedJob import SavedJob
+from apps.cellviewer.models.SavedFile import file_dimensions
 from apps.cellviewer.models.LabelMatrix import LabelMatrix
 from apps.cellviewer.components.label_matrix_input_fields import LabelMatrixInputFieldsComponent
 from apps.cellviewer.components.response_modal import ResponseModal
@@ -8,6 +11,23 @@ import regex as re
 
 
 def index(request):
+    """
+    The index page.
+    Currently the index page is the form that allows
+    inputting the file of an experiment, a few buttons need
+    to be pressed / inputs gives to get to the actual dashboard.
+    
+    The index page, will together with the input file
+    load the next section of the first page.
+    This is done this way because then the inputs are
+    based on the actual inputted file.
+    
+    Args:
+        request:
+
+    Returns:
+
+    """
     context = {
         'segment': 'index',
     }
@@ -15,6 +35,30 @@ def index(request):
 
 
 def index_follow_up_input(request):
+    """
+    A followup to the index page which renders the main form
+    with all the inputs.
+    
+    It will preprocess the file to check if the request and file
+    are in the valid format.
+    This is explained more at the function.
+    
+    This section of the page renders both
+    all inputs,
+    
+    and a table with the first 5 rows of the dataframe.
+    
+    On the page it is possible to render the dashboard
+    with the input labels, and it is possible to save the
+    contents to the dashboard.
+    
+    Args:
+        request:
+
+    Returns:
+
+    """
+    
     preprocess = index_file_preprocess_checking(request)
     if preprocess is not None:
         return preprocess
@@ -30,6 +74,7 @@ def index_follow_up_input(request):
     
     context = {
         "header": header,
+        "substances": header[3:],
         "table_data": df.head(5).rows(),
         "available_labels": available_labels,
         "row_names": rows,
@@ -41,9 +86,32 @@ def index_follow_up_input(request):
 
 
 def load_dash(request):
-    preprocess = index_file_preprocess_checking(request)
-    if preprocess is not None:
-        return preprocess
+    """
+    Renders the Dash dashboard by being called from the form.
+    It will verify separately again that the file fits the format.
+    
+    Currently it's done through Dash, talks have been had to
+    replace Dash with a more Django approach after all, which
+    allows for more leniency and flexibility.
+    To do so the dashboard needs to be rewritten in either
+    Plotly or Bokeh.
+    
+    django_plotly_dash does not allow sharing memory with the django
+    process, it is only possible to communicate through the
+    request and sessions objects. This is because the dash app is
+    loaded in the page as an embed.
+    
+    The content of the dataframe is added to the session.
+    
+    Args:
+        request:
+
+    Returns:
+
+    """
+    preprocess_response = index_file_preprocess_checking(request)
+    if preprocess_response is not None:
+        return preprocess_response
     
     files, name, labels = load_and_save_processing(request)
     
@@ -56,16 +124,36 @@ def load_dash(request):
     
 
 def save_job(request):
-    preprocess = index_file_preprocess_checking(request)
-    if preprocess is not None:
-        return preprocess
+    """
+    Saves the contents of the file to the database and will respond
+    to the user if this has succeeded or failed.
+    
+    Clicking the button to save should start a popup with a spinner,
+    the response is loaded into the modal.
+    
+    All the inputs on the index page are used to save teh job.
+    
+    Args:
+        request:
+
+    Returns:
+
+    """
+    preprocess_response = index_file_preprocess_checking(request)
+    if preprocess_response is not None:
+        return preprocess_response
     
     files, name, labels = load_and_save_processing(request)
     label_matrix_name = request.POST.get("label-layout-name")
     
+    substance_cutoffs = request.POST.getlist("substance")
+    substance_cutoffs = [substance_cutoffs] # this is because multi file is not
+    # done, but savedjob excepts multi file
+    
     saved = SavedJob.objects.create(
         request,
         files,
+        substance_cutoffs,
         name,
         labels,
         label_matrix_name
@@ -73,13 +161,29 @@ def save_job(request):
     
     html_content = ResponseModal.render(
         args=("Saved experiment with configuration successfully",
-              f"You can find the saved version at <a href='http://127.0.0.1:8000/saved_jobs/{saved.id}'>saved job</a>")
+              f"You can find the saved version at <a "
+              f"href='http://127.0.0.1:8000/saved_jobs/{saved.id}'>saved "
+              f"job</a>")
     )
     
     return HttpResponse(html_content)
 
 
 def load_and_save_processing(request):
+    """
+    Helper function
+    
+    A function that extracts values from the request.
+    The function was created to reduce certain code duplication,
+    and make it easier to change the behaviour or names across the
+    multiple functions.
+    Args:
+        request:
+
+    Returns: The files, The job/experiment name, the labels
+
+    """
+    
     files = request.FILES.getlist("inputData")
     name = request.POST.get("name")
     
@@ -90,6 +194,8 @@ def load_and_save_processing(request):
 
 def load_labels_from_request(request):
     """
+    Helper function
+    
     This will compare the default row and column
     values with the inputted values from the inputs.
     If something is not inputted, it will fall back to
@@ -101,6 +207,9 @@ def load_labels_from_request(request):
         request:
 
     Returns:
+        A tuple of the default rows names
+        A tuple of the default col names
+        A tuple containing a tuple of the rows, cols and cell names
 
     """
     default_rows = request.POST.get("default-rows").split(
@@ -121,6 +230,8 @@ def load_labels_from_request(request):
 
 def load_stored_label_matrix(request):
     """
+    Helper function
+    
     Generates a new label matrix for annotation with
     preselected inputs based on a label matrix loaded from
     the database.
@@ -147,6 +258,8 @@ def load_stored_label_matrix(request):
 
 def index_file_preprocess_checking(request):
     """
+    Helper function
+    
     Will go through a list of checks in a preprocessing
     state to ensure that the inputs fit the format properly.
     Sometimes it's possible for something to be "accepted" and

@@ -33,13 +33,54 @@ use_cols = ["Well", "Site", "Cell", "OCT4", "SOX17"]
 
 
 @app.callback(
-    [Output('callback-output', 'children'),
-     Output('intermediate-value', 'data')],
+    [Output('intermediate-value', 'data'),
+     Output("title_element", "children"),
+    Output("slider-1", "children"),
+    Output("slider-2", "children"),
+    Output("double_positive_text", "children"),
+     ],
     [Input('uploaded', "n_clicks")],
 )
 def on_page_load(n, request):
-    html_element = html.Ul([html.Li(str("test"))])
+    """
+    This is the main difference in dash between the original
+    dash application and what has been added to it.
     
+    When the Dash application is loaded, a button in the dash_app
+    will trigger this callback, initializing the intermediate-value
+    with all the data.
+    
+    django_plotly_dash does not allow sharing memory with the django
+    process, it is only possible to communicate through the
+    request and sessions objects. This is because the dash app is
+    loaded in the page as an embed.
+
+    The initial request was for no data to get stored to disk
+    unless necessary.
+    It could have been possible to write it to disk and have
+    Django automatically clean it after a reasonable time (this route
+    might be preferred if upscaling was a bigger priority).
+    Currently it communicates the whole content of the file
+    through the session as the string.
+    
+    After a dataframe has been made out of it, it will
+    be removed from the  session.
+    
+    The same is done for the labels.
+    
+    The strings of certain elements get replaced
+    by this callback as well, to have them reflect the actual
+    variable name passed on. Sadly if loading the page takes long
+    the default of OCT7 will still be seen clearly first.
+    
+    Args:
+        n:
+        request:
+
+    Returns:
+
+    """
+   
     df_content = request.session.get("celldash_df_data", None)
     if df_content is None:
         raise SuspiciousOperation("The celldash_df_data has not been set")
@@ -52,8 +93,11 @@ def on_page_load(n, request):
     del request.session["celldash_labels"]
     # del request.session["celldash_default_labels"]
     
-    sox17_max = df["SOX17"].max()
-    oct4_max = df["OCT4"].max()
+    substances = df.columns[3:]
+    sub1, sub2, *_ = substances
+    
+    sox17_max = df[sub1].max()
+    oct4_max = df[sub2].max()
     df_dump = df.to_json(orient='split')
     df_dump_filename = {
         'df': df_dump,
@@ -64,22 +108,13 @@ def on_page_load(n, request):
         # 'default_labels': default_labels,
     }
     
-    return html_element, json.dumps(df_dump_filename)
-
-
-@app.callback(Output("stored-file-confirm", "children"),
-              [Input("button-store-file", "n_clicks"),
-               Input('intermediate-value', 'data')])
-def store_file(n_clicks, jsonified_df):
-    if n_clicks is None or jsonified_df is None:
-        return no_update
-    elif n_clicks > 0:
-        df_filename = json.loads(jsonified_df)
-        filename = df_filename['filename']
-        if not os.path.exists(UPlOAD_FOLDER_STORE):
-            os.makedirs(UPlOAD_FOLDER_STORE)
-        shutil.copy(filename, UPlOAD_FOLDER_STORE)
-        return f"File has been successfuly copied in {UPlOAD_FOLDER_STORE}"
+    return [json.dumps(df_dump_filename),
+            f'Histograms of {sub1} and {sub2} intensity values',
+            f"Select {sub1} min",
+            f"Select {sub2} min",
+            f"""The percentage of cells that are double positive
+           ({sub1} and {sub2} above the set threshold)""",
+            ]
 
 
 @app.callback(
@@ -110,11 +145,10 @@ def load_data(jsonified_df):
 def update_histogram(jsonified_df):
     if jsonified_df is None:  # or selected_column is None:
         return no_update
-    selected_column = "OCT4"
     df_filename = json.loads(jsonified_df)
     df = pd.read_json(StringIO(df_filename['df']), orient='split')
-    hist_oct4 = create_hist(df, selected_column="OCT4")
-    hist_sox17 = create_hist(df, selected_column="SOX17")
+    hist_oct4 = create_hist(df, selected_column=df.columns[3])
+    hist_sox17 = create_hist(df, selected_column=df.columns[4])
     return hist_oct4, hist_sox17
 
 
@@ -175,9 +209,11 @@ def create_sox17_slider(jsonified_df):
      Input('OCT4_low', 'value'),
      Input('SOX17_low', 'value')]
 )
-def heatmap(jsonified_df, oct4_low, sox17_low):
+def heatmap(jsonified_df, oct4_low, sox17_low, request):
     if jsonified_df is None or oct4_low is None or sox17_low is None:
         return no_update
+    #
+    # request.session["celldash"]
     
     df_filename = json.loads(jsonified_df)
     df = pd.read_json(StringIO(df_filename['df']), orient='split')
@@ -214,7 +250,7 @@ def heatmap(jsonified_df, oct4_low, sox17_low):
     ))
     
     filter_description = f"Double positive cells have intensity levels above \
-        {sox17_low} for SOX17 and {oct4_low} for OCT4"
+        {sox17_low} for {df.columns[3]} and {oct4_low} for {df.columns[4]}"
     
     # Heatmap percent
     matrix_well_counts = get_well_count_matrix(df,
@@ -247,7 +283,7 @@ def get_well_count_matrix(df, oct4_low=0, sox17_low=0):
     each well in the physical plate where cells are grown. Input data
     frame is filtered on minimum threshholds of oct4 and sox17
     """
-    df = df[(df['OCT4'] > oct4_low) & (df["SOX17"] > sox17_low)]
+    df = df[(df[df.columns[3]] > oct4_low) & (df[df.columns[4]] > sox17_low)]
     well_counts = pd.DataFrame(df["Well"].value_counts())
     well_ids = well_counts.index.to_list()
     well_counts["row"] = [well[0] for well in well_ids]
