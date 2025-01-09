@@ -4,13 +4,26 @@
 {% block content %}
 
 <main>
-  <div class="px-4 pt-6">
+    
+<div class="px-4 pt-6">
       
 <div class="flex flex-wrap ">
   <div class="w-full">
+    <form action="/aggregate_jobs" method="POST">
+      {% csrf_token %}
       
-      {% component "table" title="Your saved experiment" %}
+      {% component "table" title="Your saved experiment" %}          
         {% fill "header" %}
+            
+            <button data-tooltip-target="tooltip-default" type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                Compare all selected experiments</button>
+
+            <div id="tooltip-default" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+                Note that only experiments with the same dimension can be compared.
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+            
+            <th></th>
           {% for title in header %}
             <th class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">{{ title }}</th>
           {% endfor %}
@@ -20,16 +33,17 @@
         {% fill "body" %}
           {% for line in jobs %}
             <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
-              {% for element in line|slice:"2:" %}
+              {% for element in line|slice:"1:" %} <!-- keep in mind that entry 0 and 1 are id's, entry 2 is where the ifno comes. -->
                   <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     {% if forloop.counter0 == 0 %}
-                      <a href="saved_jobs/{{ line.0 }}" class="text-sm mb-0">{{ element }}</a>
+                        <input type="checkbox" value="{{ line.0 }}" name="selected-jobs">
                     {% elif forloop.counter0 == 1 %}
-                      <a href="annotation/{{ line.1 }}" class="text-sm mb-0">{{ element }}</a>
+                        <a href="saved_jobs/{{ line.0 }}" class="text-sm mb-0">{{ element }}</a>
+                    {% elif forloop.counter0 == 2 %}
+                        <a href="annotation/{{ line.1 }}" class="text-sm mb-0">{{ element }}</a>
                     {% else %}
                       <p class="text-sm mb-0">{{ element }}</p>
                     {% endif %}
-                    
                   </td>
               {% endfor %}
             
@@ -90,7 +104,7 @@
         </a>
       </div>
   
-
+    </form>
   </div>
 </div>
 

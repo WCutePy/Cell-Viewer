@@ -1,6 +1,6 @@
 from django.urls import path
 
-from apps.cellviewer.views import index, saved_jobs, annotations
+from apps.cellviewer.views import index, saved_jobs, annotations, aggregate_jobs
 
 app_name = "cellviewer"
 
@@ -16,4 +16,5 @@ urlpatterns = [
     path("annotations", annotations.saved_annotations_page),
     path("annotation/<int:annotation_id>", annotations.annotation_page, name="annotation_page"),
     path("annotation/<int:annotation_id>/edit", annotations.edit_annotation, name='edit_annotation'),
+    path("aggregate_jobs", aggregate_jobs.aggregate_jobs, name="aggregate_jobs"),
 ]

@@ -17,9 +17,11 @@ def emtpy_dir(folder):
 
 
 app.layout = html.Div([
-    html.Button("get plots??", id="uploaded", n_clicks=0),
-    html.Div(id='callback-output'),
-    html.H2('Histograms of OCT4 and SOX17 intensity values'),
+    
+    # this button loads the plots. Don't change this unless you
+    # know a better way that doesn't use a button.
+    html.Button("get plots??", id="uploaded", n_clicks=0, style={'display': 'none'}),
+    html.H2('Histograms of OCT4 and SOX17 intensity values', id="title_element"),
     dbc.Row(
         [
             # Hist A
@@ -38,13 +40,13 @@ app.layout = html.Div([
         [
             dbc.Col(
                     # Slider to select OCT4 lower limit
-                    [html.H2('Select OCT4 min'),
+                    [html.H2('Select OCT4 min', id="slider-1"),
                     html.Br(),
                     html.Div(id='OCT4-slider')],
                     width=width_histogram),
             dbc.Col(
                     # Slider to select SOX17 lower limit
-                    [html.H2('Select SOX17 min'),
+                    [html.H2('Select SOX17 min', id="slider-2"),
                     html.Br(),
                     html.Div(id='SOX17-slider')],
                     width=width_histogram)
@@ -60,7 +62,7 @@ app.layout = html.Div([
     html.H2('Heatmap of percentage of double positive cell counts \
             per well'),
     html.P("""The percentage of cells that are double positive
-           (SOX17 and OCT4 above the set threshold)"""),
+           (SOX17 and OCT4 above the set threshold)""", id="double_positive_text"),
     html.Div(id='filter-description'),
     dcc.Graph(id='heatmap_pct-fig'),
     

@@ -3,6 +3,10 @@ from django_components import Component, register
 
 @register("table")
 class Table(Component):
+    """
+    A standardized table with header and body to fill for the enduser.
+    """
+    
     def get_context_data(self, title):
         return {
             "title": title,

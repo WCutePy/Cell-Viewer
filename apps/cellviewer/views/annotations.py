@@ -4,6 +4,22 @@ from apps.cellviewer.views.index import load_labels_from_request
 
 
 def saved_annotations_page(request):
+    """
+    Renders a page with all annotations.
+    
+    It queries the database for all annotations of a user.
+    The page displays headers relating to the fields, and
+    the values.
+    
+    The annotation page displays a table with the information
+    and a link to the individual annotation.
+    
+    Args:
+        request:
+
+    Returns:
+
+    """
     annotations = LabelMatrix.objects.get_all_of_user(request.user)
 
     fields = ["id", "matrix_name", "dimension_string", "public",

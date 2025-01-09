@@ -3,6 +3,19 @@ from django_components import Component, register
 
 @register("label_matrix_input_fields")
 class LabelMatrixInputFieldsComponent(Component):
+    """
+    A component for the input fields of a labelmatrix.
+    
+    It holds an input for the name, a matrix of input fields
+    for the row, column and cell names.
+    It also adds a hidden input for the original name
+    This should make it possible to have a default value
+    if fields are made empty. As empty fields is not expected, this
+    is not allowed through that as a backup.
+    
+    This component gets used in multiple places and ways.
+    """
+    
     def get_context_data(self, matrix_name, row_names, col_names, cell_names):
         return {
             "matrix_name": matrix_name,

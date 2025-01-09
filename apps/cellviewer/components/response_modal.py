@@ -3,6 +3,26 @@ from django_components import Component, register
 
 @register("response_modal")
 class ResponseModal(Component):
+    """
+    A response modal, which can be made to pop on top of the screen
+    as a modal should.
+    
+    This can be used to display any amount of messages to the user.
+    It is used by the save function to display multiple responses
+    to the screen indicating the success or failure.
+    It could be used in more places if needed.
+    
+    It has a built in response spinner, which will spin until
+    the response is loaded inside of the modal.
+    
+    Important to note, is that this element needs to be put inside of
+    a dialog element to function properly.
+    It was not possible to have the dialog part be a part of
+    this component, and have it function as expected.
+    Potentially with more advanced javascript it could be made
+    to function "as expected", but currently that is not the case.
+    """
+    
     def get_context_data(self, title, text):
         return {
             "title": title,

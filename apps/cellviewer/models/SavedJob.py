@@ -4,38 +4,20 @@ from django.db import models
 from django.contrib.auth.models import User
 import polars as pl
 
+from django.db.models import QuerySet
 from apps.cellviewer.models.LabelMatrix import LabelMatrix
 from apps.cellviewer.models.SavedFile import SavedFile
 from django.db import transaction
-
-
-def file_dimensions(df: pl.DataFrame) -> tuple[int, tuple[list[str], list[str]]]:
-    """
-    Helper function which returns the row count, and all row names and
-    column names that appear as a sorted list, to have the dimensions
-    be calculated from that.
-    It presumes all the letters it can find are the rows.
-    All the numbers are the columns. It does not care
-    if a letter number combination is missing and ignores such things.
-    Args:
-        df:
-
-    Returns:
-
-    """
-    rows = df.height
-    name = df.columns[0]
-    tags = df[name].arr.explode().unique().to_list()
-    
-    letters = sorted(set(t.strip(digits) for t in tags))
-    numbers = sorted(set(t.strip(ascii_letters) for t in tags))
-    return rows, (letters, numbers)
+from django.apps import apps
 
 
 class SavedJobManager(models.Manager):
     
     @transaction.atomic
-    def create(self, request, files: list["InMemoryUploadedFile"], name: str, labels: tuple[tuple[str]], label_matrix_name: str):
+    def create(
+            self, request, files: list["InMemoryUploadedFile"],
+            files_substance_thresholds,
+            name: str, labels: tuple[tuple[str]], label_matrix_name: str):
         """
         Saves a "job" in the database. This manages the creation of all aspects of it.
         
@@ -78,6 +60,7 @@ class SavedJobManager(models.Manager):
             label_matrix_name:
             request:
             files:
+            files_substance_thresholds:
             name:
             labels:
 
@@ -91,7 +74,8 @@ class SavedJobManager(models.Manager):
         
         for file in files:
             initialized_file_object, current_users_size_in_b = (
-                SavedFile.create(request, file, current_users_size_in_b))
+                SavedFile.objects.create(request, file, current_users_size_in_b)
+            )
             
             next_dimension = (initialized_file_object.matrix_row_count, initialized_file_object.matrix_col_count)
             if next_dimension != first_dimension and first_dimension != (0, 0):
@@ -125,18 +109,56 @@ class SavedJobManager(models.Manager):
         
         saved_job.save()
         
-        for file in to_save_files:
+        if label_matrix.matrix_name == "Annotation name":
+            label_matrix.matrix_name = f"Annotation {saved_job.name}"
+            label_matrix.save()
+        
+        FilteredFile = apps.get_model("cellviewer", "FilteredFile")
+        
+        for file, substance_thresholds in zip(to_save_files, files_substance_thresholds):
             file.save()
-        saved_job.files.add(*to_save_files)
+            
+            filtered_file = FilteredFile.objects.create(
+                job=saved_job,
+                saved_file=file,
+                substance_thresholds=";".join(str(i) for i in substance_thresholds),
+            )
+            filtered_file.save()
+            
+        # saved_job.files.add(*to_save_files)
         
         return saved_job
     
-    def get_all_jobs_for_user(self, user: User | int):
+    def get_all_jobs_for_user(self, user: User | int) -> QuerySet:
+        """
+        Gets all jobs of a certain user, by their User object
+        or the user id
+        Args:
+            user:
+
+        Returns: Queryset
+        """
         if isinstance(user, User):
             user = user.id
         return self.filter(user_id=user)
     
-    def get_users_used_file_storage(self, user: User | int):
+    def get_users_used_file_storage(self, user: User | int) -> int:
+        """
+        Determines an estimation of a users used file storage in bytes.
+        by summing the size recorded into the database of
+        each unique file.
+        
+        It is likely for the actual size to exceed this number
+        related to the way the operating system writes to disk.
+        However this is expected to be a small difference
+        and not be significantly impactful.
+        
+        Args:
+            user: User object or user id
+
+        Returns: Used file storage in bytes
+
+        """
         if isinstance(user, User):
             user = user.id
         unique_files = self.filter(user_id=user).values("files").distinct()
@@ -148,10 +170,29 @@ class SavedJobManager(models.Manager):
 
 
 class SavedJob(models.Model):
+    """
+    A SavedJob/experiment
+    
+    A SavedJob/experiment can have multiple files assigned to it
+    with the same dimension, and has a label matrix with the
+    same dimensions
+    
+    Everything to do with a single experiment should
+    be handled from a SavedJob.
+    
+    Currently adding multiple files to one SavedJob
+    is not done/supported within the whole application,
+    so using multiple SavedJob's might be done.
+    Doing things that way is a workaround and not the originally
+    intended design. However if it works it works.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     
-    files = models.ManyToManyField(SavedFile, related_name="job_files")
+    files = models.ManyToManyField(
+        SavedFile, related_name="job_files",
+        through="FilteredFile"
+    )
     
     date = models.DateTimeField(auto_now_add=True)
     
@@ -162,6 +203,27 @@ class SavedJob(models.Model):
     objects = SavedJobManager()
     
     def delete(self, *args, **kwargs):
+        """
+        Deletes a SavedJob
+        
+        For each file it will remove them from the SavedJob and
+        then attempt to delete them. It is possible this will
+        fail as other SavedJobs still reference the file.
+        This will fail silently.
+        It is required that the file is removed from the SavedJob.
+        If not the super().delete() will force remove it anyways.
+        
+        It attempts to delete the LabelMatrix.
+        This too fails silently if it is referenced by other
+        SavedJobs.
+        
+        Args:
+            *args:
+            **kwargs:
+
+        Returns:
+
+        """
         for saved_file in self.files.all():
             self.files.remove(saved_file)
             saved_file.delete()
