@@ -14,6 +14,9 @@ def saved_annotations_page(request):
     The annotation page displays a table with the information
     and a link to the individual annotation.
     
+    It displays the name, dimension, if it's publicly available,
+    and if it will remain if unused.
+    
     Args:
         request:
 
@@ -36,6 +39,26 @@ def saved_annotations_page(request):
 
 
 def annotation_page(request, annotation_id: int):
+    """
+    Renders the annotation page template
+    
+    The annotation page allows you to look at an individual
+    annotations content, and allow editing it.
+    
+    It is only allowed to look at ones own
+    annotation.
+    
+    It displays all the information as inputs, which
+    allows the user to change them,
+    however nothing is changed unless the update button is pressed.
+    
+    Args:
+        request:
+        annotation_id:
+
+    Returns:
+
+    """
     annotation = LabelMatrix.objects.get(id=annotation_id)
 
     if annotation.created_by.id != request.user.id:
@@ -56,6 +79,25 @@ def annotation_page(request, annotation_id: int):
 
 
 def edit_annotation(request, annotation_id: int):
+    """
+    Redirects to the annotation page
+    
+    Updates the annotation with the inputted information.
+    
+    It will verify the information and
+    verifies that the annotation belongs to the user.
+    the LabelMatrix's update method.
+    
+    After updating it redirects to the annotation page,
+    reloading it with its updated information.
+    
+    Args:
+        request:
+        annotation_id:
+
+    Returns:
+
+    """
     annotation = LabelMatrix.objects.get(id=annotation_id)
 
     if annotation.created_by.id != request.user.id:
