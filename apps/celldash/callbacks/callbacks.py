@@ -247,6 +247,7 @@ def heatmap(jsonified_df, oct4_low, sox17_low, request):
         y=labels[0][::-1],
         hoverinfo='text',
         text=label_text[::-1],
+        texttemplate="%{z}",
     ))
     
     filter_description = f"Double positive cells have intensity levels above \
@@ -272,6 +273,7 @@ def heatmap(jsonified_df, oct4_low, sox17_low, request):
         y=labels[0][::-1],
         hoverinfo='text',
         text=pct_label_text[::-1],
+        texttemplate="%{z}",
     ))
 
     return heatmap_fig, heatmap_pct_fig, filter_description
@@ -285,12 +287,12 @@ def get_well_count_matrix(df, oct4_low=0, sox17_low=0):
     """
     df = df[(df[df.columns[3]] > oct4_low) & (df[df.columns[4]] > sox17_low)]
     well_counts = pd.DataFrame(df["Well"].value_counts())
-    print(well_counts)
+
     well_ids = well_counts.index.to_list()
     well_counts["row"] = [well[0] for well in well_ids]
     well_counts["cols"] = [well[1:] for well in well_ids]
     matrix_well_counts = well_counts.pivot(index="row", columns="cols",
                                            values="count")
     matrix_well_counts.fillna(0, inplace=True)
-    print([matrix_well_counts])
+
     return matrix_well_counts
