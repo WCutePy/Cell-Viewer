@@ -40,6 +40,12 @@ Running through Docker is simple, just
 `docker-compose up --build`
 It should then run at http://localhost:5085
 
+When having issues launching on docker, or on unix.
+As a result to most of the application having been developed on Windows, it might be necessary to
+perform a command like `dos2unix *` to get the application to work.
+If it is needed running the docker will show 
+"invalid option| /bin/bash: -"
+
 ## manual Running
 To develop on windows you can run 
 `.\env\Scripts\activate`
