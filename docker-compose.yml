@@ -9,7 +9,12 @@ services:
       - db_network
       - web_network
     volumes:
-      - ./db.sqlite3:/db.sqlite3
+      - type: bind
+        source: ./db.sqlite3
+        target: /db.sqlite3
+      - type : bind 
+        source: ./media
+        target: /media
 
   nginx:
     container_name: nginx
