@@ -15,10 +15,7 @@ regex==2024.11.6
 
 
 # Dash
-dash==2.18.1
-django_plotly_dash==2.4.3
-dash_bootstrap_components==1.6.0
-packaging==21.3
+packaging==21.3 # potentially can be removed as no longer using dash
 
 # Services
 #redis==5.2.0

@@ -1288,6 +1288,10 @@ input:checked + .toggle-bg {
   margin-left: 2rem;
 }
 
+.ml-\[55px\] {
+  margin-left: 55px;
+}
+
 .ml-auto {
   margin-left: auto;
 }
@@ -1450,10 +1454,6 @@ input:checked + .toggle-bg {
 
 .h-9 {
   height: 2.25rem;
-}
-
-.h-\[130rem\] {
-  height: 130rem;
 }
 
 .h-full {
@@ -1729,8 +1729,18 @@ input:checked + .toggle-bg {
   list-style-type: none;
 }
 
+.appearance-none {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .grid-cols-3 {
@@ -2922,10 +2932,6 @@ input:checked + .toggle-bg {
   }
 }
 
-.\*\:\!h-full > * {
-  height: 100% !important;
-}
-
 .after\:absolute::after {
   content: var(--tw-content);
   position: absolute;
@@ -2936,14 +2942,14 @@ input:checked + .toggle-bg {
   inset-inline-start: 2px;
 }
 
-.after\:top-\[2px\]::after {
-  content: var(--tw-content);
-  top: 2px;
-}
-
 .after\:top-0\.5::after {
   content: var(--tw-content);
   top: 0.125rem;
+}
+
+.after\:top-\[2px\]::after {
+  content: var(--tw-content);
+  top: 2px;
 }
 
 .after\:h-5::after {

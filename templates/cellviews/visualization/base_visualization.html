@@ -1,0 +1,47 @@
+
+<div class="flex flex-wrap ">
+  <div class="w-full">
+    <div class="h-full bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <h2 class="flex justify-center text-2xl"
+            id="title_element">Histograms of {{ substances_str }} intensity values</h2>
+        <div class="grid grid-cols-2 gap-6">
+        {% for substance_name, histogram, max_value in histogram_data %}
+            <div>
+                <div id="histogram{{ substance_name }}">
+                    {{ histogram|safe }}
+                </div>
+                
+                <div class="ml-[55px]">
+                    <label for="steps-range" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select {{ substance_name }} min: <span id="slider-value-{{ forloop.counter }}" class="mt-2 text-gray-600">0</span></label>
+                    
+                    <input id="steps-range-{{ forloop.counter0 }}" name="substance_threshold" type="range" min="0" max="{{ max_value }}" value="0" step="0.1" class="w-full    h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+        <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            type="submit" name="job_id" value="{{ job_id }}"
+            hx-post='/update_filtered_plots' hx-target="#filtered_plots"
+            >Update filtered plots with thresholds</button>
+
+        <h2 class="flex justify-center text-2xl">Heatmap of total cell counts per well</h2>
+
+        {{ heatmap_total_cell_counts|safe }}
+
+        <div id="filtered_plots">
+            {% include "cellviews/visualization/base_visualization_filtered_part.html" %}
+        </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+    document.querySelectorAll('input[type="range"]').forEach((slider, index) => {
+        const valueDisplay = document.getElementById('slider-value-' + (index + 1));
+
+        slider.addEventListener('input', function() {
+            valueDisplay.textContent = slider.value;
+        });
+    });
+</script>

@@ -4,6 +4,8 @@ from apps.cellviewer.models.SavedJob import SavedJob
 import polars as pl
 from functools import reduce
 
+from apps.cellviewer.views.plot_insert_page import plot_insert_element
+
 
 def saved_jobs(request):
     """
@@ -70,17 +72,20 @@ def display_job(request, job_id: int):
     
     labels = job.label_matrix.get_labels
     
-    data = filtered_file.generate_filtered_polars_dataframe()
+    df = filtered_file.load_polars_dataframe()
     
-    substance_names = data.columns[3:]
+    substance_names = df.columns[3:]
     substance_thresholds = filtered_file.get_substance_thresholds_as_list
     
-    request.session["celldash_df_data"] = data.write_csv()
-    request.session["celldash_labels"] = labels
+    sub_context = plot_insert_element(
+        df, labels, pre_filter_substance_threshold=substance_thresholds
+    )
     
     context = {
         'substances': [(name, threshold) for name, threshold in
                        zip(substance_names, substance_thresholds)],
+        **sub_context,
+        "job_id": job_id
     }
 
     return render(request, "cellviews/display_saved_job.html", context)
