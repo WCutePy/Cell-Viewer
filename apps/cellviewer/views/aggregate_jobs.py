@@ -1,25 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from apps.cellviewer.models.FilteredFile import FilteredFile
-from apps.cellviewer.models.SavedJob import SavedJob
-import polars as pl
-from functools import reduce
 
-
-import numpy as np
-from dash import Dash, dcc, html, Input, Output, \
-    callback, no_update, State
-from pathlib import Path
-from io import StringIO
 import pandas as pd
-import json
-import os
-import shutil
-import plotly.express as px
-import dash_bootstrap_components as dbc
-from django_plotly_dash import DjangoDash
-from django.core.exceptions import SuspiciousOperation
-from io import StringIO
-from plotly import graph_objects as go
+
+from apps.cellviewer.util.plots import generate_heatmap_with_label
 
 
 def aggregate_jobs(request):
@@ -52,8 +36,8 @@ def aggregate_jobs(request):
     
     for filtered_file in filtered_files:
     
-        well_count_matrix, well_count_matrix_percent = (
-            filtered_file.get_well_count_and_well_count_percent())
+        well_count_matrix, _, well_count_matrix_percent = (
+            filtered_file.get_well_counts_and_percent())
         
         matrices.append(
             (well_count_matrix, well_count_matrix_percent)
@@ -93,33 +77,3 @@ def aggregate_jobs(request):
     return render(request, "cellviews/aggregate_jobs.html", context)
 
 
-def generate_heatmap_with_label(labels, matrix, additional_text):
-    base_label_text = [
-        [f"Row: {labels[0][i]}<br>" \
-         f"Col: {labels[1][j]}<br>" \
-         f"Cell: {labels[2][len(labels[1]) * i + j]}"
-         for j in range(len(labels[1]))
-         ] for i in range(len(labels[0]))
-    ]
-    
-    label_text = [
-        [col +
-         f"<br>{additional_text}: {matrix.iloc[i, j]}"
-         for j, col in enumerate(row)
-         ]
-        for i, row in enumerate(base_label_text)
-    ]
-    """
-    It is required to invert everything related to the y column, as go.heatmap works from bottom to top.
-    There might be a smoother way to solve this but I was not able to find one.
-    """
-    heatmap_fig = go.Figure(data=go.Heatmap(
-        z=np.where(matrix == 0, None,
-                   matrix)[::-1],
-        x=labels[1],
-        y=labels[0][::-1],
-        hoverinfo='text',
-        text=label_text[::-1],
-    ))
-    
-    return heatmap_fig

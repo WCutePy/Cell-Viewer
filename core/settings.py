@@ -60,9 +60,7 @@ INSTALLED_APPS = [
     "apps.users",
     
     "apps.cellviewer",
-    "apps.celldash",
     
-    "django_plotly_dash.apps.DjangoPlotlyDashConfig",
     'django_components',
 
     "django_celery_results",

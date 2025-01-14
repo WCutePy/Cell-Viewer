@@ -17,13 +17,11 @@
 </div>
 
   <div class="px-4 pt-6">
-      
-      {% include 'cellviews/sub_page/dash_embed.html' %}
-      
+      <form>
+        {% include 'cellviews/visualization/base_visualization.html' %}
+      </form>
   </div>
 
 </main>
 
 {% endblock content %}
-
-{%load plotly_dash%}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from apps.cellviewer.models.LabelMatrix import LabelMatrix
-from apps.cellviewer.views.index import load_labels_from_request
+from apps.cellviewer.util.index_helpers import load_labels_from_request
 
 
 def saved_annotations_page(request):

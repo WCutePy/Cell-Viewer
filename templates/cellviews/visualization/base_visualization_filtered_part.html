@@ -1,0 +1,13 @@
+
+<h2 class="flex justify-center text-2xl">Heatmap of filtered cell counts per well</h2>
+
+{{ heatmap_filtered_cell_counts|safe }}
+
+<h2 class="flex justify-center text-2xl">Heatmap of double positives per well</h2>
+
+<div id="double_positive_plot">
+The percentage of cells that are double positive ({{ substances_str }} above the set threshold)
+Double positive cells have intensity levels above {{ sub_and_threshold_str }}
+
+{{ heatmap_percentage|safe }}
+</div>

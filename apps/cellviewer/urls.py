@@ -1,6 +1,8 @@
 from django.urls import path
 
-from apps.cellviewer.views import index, saved_jobs, annotations, aggregate_jobs
+import apps.cellviewer.util.index_helpers
+from apps.cellviewer.views import index, saved_jobs, annotations, \
+    aggregate_jobs, plot_insert_page
 
 app_name = "cellviewer"
 
@@ -8,7 +10,8 @@ urlpatterns = [
     path("", index.index, name="index"),
     path("input_data", index.index_follow_up_input),
     path("load_dash", index.load_dash),
-    path("load_stored_label_matrix", index.load_stored_label_matrix),
+    path("load_stored_label_matrix",
+         apps.cellviewer.util.index_helpers.load_stored_label_matrix),
     path("save_job", index.save_job),
     path("saved_jobs", saved_jobs.saved_jobs, name="saved_jobs"),
     path("saved_jobs/<int:job_id>/", saved_jobs.display_job),
@@ -17,4 +20,5 @@ urlpatterns = [
     path("annotation/<int:annotation_id>", annotations.annotation_page, name="annotation_page"),
     path("annotation/<int:annotation_id>/edit", annotations.edit_annotation, name='edit_annotation'),
     path("aggregate_jobs", aggregate_jobs.aggregate_jobs, name="aggregate_jobs"),
+    path("update_filtered_plots", plot_insert_page.update_filtered_plots, name="update_filtered_plots")
 ]
