@@ -1,13 +1,41 @@
+{% load static %}
+
 
 <h2 class="flex justify-center text-2xl">Heatmap of filtered cell counts per well</h2>
 
+<div class="flex justify-end">
+<button id="filtered-cell-counts-btn" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm
+px-5 py-2.5 my-2 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+    Download filtered cell counts csv</button>
+</div>
+
+<div class="max-w-[60rem]">
 {{ heatmap_filtered_cell_counts|safe }}
+</div>
 
 <h2 class="flex justify-center text-2xl">Heatmap of double positives per well</h2>
 
-<div id="double_positive_plot">
-The percentage of cells that are double positive ({{ substances_str }} above the set threshold)
-Double positive cells have intensity levels above {{ sub_and_threshold_str }}
+<p>The percentage of cells that are double positive ({{ substances_str }} above the set threshold)
+Double positive cells have intensity levels above {{ sub_and_threshold_str }}</p>
 
-{{ heatmap_percentage|safe }}
+<div class="flex justify-end">
+<button id="double-positives-btn" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm
+    px-5 py-2.5 my-2 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+    Download double positives csv</button>
 </div>
+
+<div id="double_positive_plot" class="max-w-[60rem]">
+    {{ heatmap_percentage|safe }}
+</div>
+
+<script src={% static 'assets/download-file.js' %}></script>
+<script>
+    var file_filtered_counts = `{{ file_filtered_counts|escapejs }}`;
+    var file_double_positives = `{{ file_double_positives|escapejs }}`;
+
+    var button2 = document.getElementById("filtered-cell-counts-btn");
+    button2.addEventListener("click", fileDownloader(() => file_filtered_counts, `{{ name }}_filtered_cell_counts.csv`));
+
+    var button3 = document.getElementById("double-positives-btn");
+    button3.addEventListener("click", fileDownloader(() => file_double_positives, `{{ name }}_double_positives.csv`));
+</script>
