@@ -22,7 +22,7 @@
               {% for element in line|slice:"1:" %}
                   <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     {% if forloop.counter0 == 0 %}
-                      <a href="annotation/{{ line.0 }}" class="text-sm mb-0">{{ element }}</a>
+                      <a href="annotation/{{ line.0 }}" class="text-blue-500 hover:underline visited:text-purple-600 text-sm mb-0">{{ element }}</a>
                     {% else %}
                       <p class="text-sm mb-0">{{ element }}</p>
                     {% endif %}
