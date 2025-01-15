@@ -27,7 +27,7 @@ def saved_jobs(request):
     """
     jobs = SavedJob.objects.get_all_jobs_for_user(request.user).select_related("label_matrix")
     fields = ["id", "label_matrix_id", "name", "label_matrix__matrix_name", "date", "dimension"]
-    headers = ["name", "annotation", "date", "dimension", "loi"]
+    headers = ["name", "annotation", "date", "dimension", ""]
     jobs = jobs.values(*fields)
     
     data = (
