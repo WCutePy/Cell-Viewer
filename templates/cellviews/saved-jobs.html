@@ -15,8 +15,10 @@
       {% component "table" title="Your saved experiment" %}          
         {% fill "header" %}
             
+            <div class="flex justify-end py-2">
             <button data-tooltip-target="tooltip-default" type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                 Compare all selected experiments</button>
+            </div>
 
             <div id="tooltip-default" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
                 Note that only experiments with the same dimension can be compared.
@@ -38,9 +40,9 @@
                     {% if forloop.counter0 == 0 %}
                         <input type="checkbox" value="{{ line.0 }}" name="selected-jobs">
                     {% elif forloop.counter0 == 1 %}
-                        <a href="saved_jobs/{{ line.0 }}" class="text-sm mb-0">{{ element }}</a>
+                        <a href="saved_jobs/{{ line.0 }}" class="text-blue-500 hover:underline visited:text-purple-600 text-sm mb-0">{{ element }}</a>
                     {% elif forloop.counter0 == 2 %}
-                        <a href="annotation/{{ line.1 }}" class="text-sm mb-0">{{ element }}</a>
+                        <a href="annotation/{{ line.1 }}" class="text-blue-500 hover:underline visited:text-purple-600 text-sm mb-0">{{ element }}</a>
                     {% else %}
                       <p class="text-sm mb-0">{{ element }}</p>
                     {% endif %}
