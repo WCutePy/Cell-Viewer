@@ -78,7 +78,7 @@ def display_job(request, job_id: int):
     substance_thresholds = filtered_file.get_substance_thresholds_as_list
     
     sub_context = plot_insert_element(
-        df, labels, pre_filter_substance_threshold=substance_thresholds
+        df, labels, pre_filter_substance_threshold=substance_thresholds, name=job.name
     )
     
     context = {

@@ -118,7 +118,10 @@ def load_dash(request):
     file = files[0]
     df = pl.read_csv(file)
     
-    sub_context = plot_insert_element(df, labels)
+    if not name:
+        name = "unnamed"
+    
+    sub_context = plot_insert_element(df, labels, name=name)
     
     context = {
         **sub_context

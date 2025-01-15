@@ -23,7 +23,8 @@ def create_hist(df, selected_column):
         b=10,  # bottom margin
         l=10,  # left margin
         r=10   # right margin
-        )
+        ),
+        autosize=True,
     )
     return hist, max_value
 

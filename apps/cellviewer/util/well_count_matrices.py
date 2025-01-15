@@ -15,7 +15,7 @@ def filtered_polars_dataframe(df: pl.DataFrame,
     return df
 
 
-def generate_well_count_matrix(df: pl.DataFrame):
+def generate_well_count_matrix(df: pl.DataFrame) -> pd.DataFrame:
     well_counts = df.group_by("Well").count().to_pandas()
     
     well_counts["row"] = [well[0] for well in well_counts["Well"]]
