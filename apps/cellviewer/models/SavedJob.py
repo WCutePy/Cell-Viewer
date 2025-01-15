@@ -142,6 +142,15 @@ class SavedJobManager(models.Manager):
             user = user.id
         return self.filter(user_id=user)
     
+    def get_all_viewable_jobs(self, user: User | int) -> QuerySet:
+        """
+        All viewable jobs might be changed in the future.
+        Currently this constitutes all jobs in the database.
+        Returns:
+
+        """
+        return self.all()
+        
     def get_users_used_file_storage(self, user: User | int) -> int:
         """
         Determines an estimation of a users used file storage in bytes.
@@ -231,3 +240,39 @@ class SavedJob(models.Model):
         self.label_matrix.delete()
         
         return super().delete(*args, **kwargs)
+    
+    def is_viewable_by(self, user: int | User):
+        """
+        Currently the request is that everything is viewable for
+        everyone. As such, this function is a placeholder
+        for more complex future logic.
+        
+        If this logic never comes that is fine, however
+        it is better to keep it in mind, rather than
+        delete any checking that previously existed already.
+        Args:
+            user:
+
+        Returns:
+
+        """
+        if isinstance(user, User):
+            user = user.id
+        
+        return True
+    
+    def is_deletable_by(self, user: int | User):
+        """
+        This too moves the check to a class based existence.
+        
+        Args:
+            user:
+
+        Returns:
+
+        """
+        if isinstance(user, User):
+            user = user.id
+        
+        return self.user.id == user
+    

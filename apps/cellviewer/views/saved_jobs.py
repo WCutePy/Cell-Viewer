@@ -25,7 +25,7 @@ def saved_jobs(request):
     Returns:
 
     """
-    jobs = SavedJob.objects.get_all_jobs_for_user(request.user).select_related("label_matrix")
+    jobs = SavedJob.objects.get_all_viewable_jobs(request.user).select_related("label_matrix")
     fields = ["id", "label_matrix_id", "name", "label_matrix__matrix_name", "date", "dimension"]
     headers = ["name", "annotation", "date", "dimension", ""]
     jobs = jobs.values(*fields)
@@ -67,7 +67,7 @@ def display_job(request, job_id: int):
         return
     filtered_file: FilteredFile = filtered_files.first()
     job = filtered_file.job
-    if job.user.id != request.user.id:
+    if not job.is_viewable_by(request.user.id):
         return
     
     labels = job.label_matrix.get_labels
@@ -109,7 +109,7 @@ def delete_job(request, job_id: int):
     if job.count() == 0:
         return
     job = job.first()
-    if job.user.id != request.user.id:
+    if not job.is_deletable_by(request.user.id):
         return
 
     job.delete()
