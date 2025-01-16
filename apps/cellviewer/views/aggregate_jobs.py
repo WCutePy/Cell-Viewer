@@ -9,13 +9,12 @@ from apps.cellviewer.util.plots import generate_heatmap_with_label
 def aggregate_jobs(request):
     job_ids = request.POST.getlist("selected-jobs")
     # job_ids = ["11", "13"]
-    
+
     if len(job_ids) < 2:
         return
     
     filtered_files = FilteredFile.objects.filter(job_id__in=job_ids).select_related \
         ('job', 'saved_file')
-    
     if filtered_files.count() < 2:
         return
     
@@ -25,7 +24,7 @@ def aggregate_jobs(request):
     # can expand this to require having the same annotation matrix
     dimension = first_files_job.dimension
     for filtered_file in filtered_files:
-        if filtered_file.job.user.id != request.user.id:
+        if not filtered_file.job.is_viewable_by(request.user):
             return
         if dimension != filtered_file.job.dimension:
             return
