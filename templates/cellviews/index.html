@@ -51,5 +51,13 @@
 {#    </button>#}
 </form>
 </main>
+    
+<!-- the index page itself does not make use of this, however the visualization requires this. When a page
+Gets loaded with htmx no new javascript will be loaded, unless it's embedded in the loaded page itself.
+That is what requires this to be done like this, the functions within download-file are needed.
+It might be possible to get this function within the distribution bundle, however the few attempts
+I did didn't work directly, so that will be pushed to the future.
+--> 
+<script src="{% static 'assets/download-file.js' %}"></script>
 
 {% endblock content %}

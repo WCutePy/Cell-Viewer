@@ -53,7 +53,10 @@
   </div>
 </div>
 
-<script src={% static 'assets/download-file.js' %}></script>
+<!-- if this page is being loaded through htmx, the functions defined in download-file, must
+be included in the root page loading this section. This has to do with how htmx loads a section,
+and it does not add to the javascript. -->
+<script src="{% static 'assets/download-file.js' %}"></script>
 <script>
     document.querySelectorAll('input[type="range"]').forEach((slider, index) => {
         const valueDisplay = document.getElementById('slider-value-' + (index + 1));
