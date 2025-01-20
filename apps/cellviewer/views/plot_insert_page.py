@@ -11,7 +11,7 @@ from apps.cellviewer.util.index_helpers import load_and_save_processing
 
 
 def plot_insert_element(df: pl.dataframe, labels,
-                        substance_threshold: list[float] = None,
+                        substance_thresholds: list[float] = None,
                         include: list[str]=("all",),
                         name=None
                         ):
@@ -53,7 +53,7 @@ def plot_insert_element(df: pl.dataframe, labels,
     Args:
         df: a polars dataframe
         labels: The labels in the list format [row, col, cells]
-        substance_threshold: a list with floats
+        substance_thresholds: a list with floats
         include: a list of strings for the elements.
             Leaving this empty gives all.
         name:
@@ -66,15 +66,15 @@ def plot_insert_element(df: pl.dataframe, labels,
     substances = df.columns[3:]
     amount_of_sites = df["Site"].max()
     
-    if substance_threshold is None:
-        substance_threshold = (0,) * len(substances)
+    if substance_thresholds is None:
+        substance_thresholds = (0,) * len(substances)
     
     context = {
     }
     
     if "all" in include or "hist" in include:
         histograms_data = []
-        for substance, threshold in zip(substances, substance_threshold):
+        for substance, threshold in zip(substances, substance_thresholds):
             hist, max_value = create_hist(
                 df, substance
             )
@@ -87,9 +87,9 @@ def plot_insert_element(df: pl.dataframe, labels,
         })
     
     well_count_matrix, filtered_well_count_matrix, \
-        well_count_matrix_percent = (
+        well_positives_percent = (
         generate_well_counts_and_percent(
-            df, substance_threshold
+            df, substance_thresholds
         ))
     
     if "all" in include:
@@ -99,11 +99,30 @@ def plot_insert_element(df: pl.dataframe, labels,
             ).to_html(),
             "file_count_matrix": well_count_matrix.to_csv(),
         })
+        
+    
+    full_file_content = f"""
+Original file name,file_name
+Experiment name,{name}
+Substance_thresholds:
+{"\n".join(f"{a},{b}" for a, b in zip(substances, substance_thresholds))}
+
+
+Well counts per well
+{well_count_matrix.to_csv()}
+
+Well counts filtered on the substance thresholds
+{filtered_well_count_matrix.to_csv()}
+
+Double positives above the thresholds.
+{well_positives_percent.to_csv()}
+"""
+    
     
     context.update({
         "substances_str": " and ".join(substances),
         "sub_and_threshold_str": " and ".join(
-            f"{a} for {b}" for a, b in zip(substance_threshold, substances)
+            f"{a} for {b}" for a, b in zip(substance_thresholds, substances)
         ),
         "amount_of_sites": amount_of_sites,
         
@@ -113,9 +132,11 @@ def plot_insert_element(df: pl.dataframe, labels,
         "file_filtered_counts": filtered_well_count_matrix.to_csv(),
         
         "heatmap_percentage": generate_heatmap_with_label(
-            labels, well_count_matrix_percent, "Count"
+            labels, well_positives_percent, "Count"
         ).to_html(),
-        "file_double_positives": well_count_matrix_percent.to_csv(),
+        "file_double_positives": well_positives_percent.to_csv(),
+        
+        "file_all": full_file_content,
         
         "job_id": "-1",
         "name": name,
@@ -202,15 +223,12 @@ def update_filtered_plots(request):
         
         df = filtered_file.load_polars_dataframe()
         
-        pre_filter_substance_threshold = filtered_file.get_substance_thresholds_as_list
-        
         name = job.name
     
-    substance_threshold = [float(i) for i in
+    substance_thresholds = [float(i) for i in
                            request.POST.getlist("substance_threshold")]
     
-    context = plot_insert_element(df, labels, pre_filter_substance_threshold,
-                                  substance_threshold, name=name)
+    context = plot_insert_element(df, labels, substance_thresholds, name=name)
     return render(request,
                   "cellviews/visualization/base_visualization_filtered_part.html",
                   context)
