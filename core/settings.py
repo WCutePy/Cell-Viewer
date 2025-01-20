@@ -37,7 +37,7 @@ DEBUG = str2bool(os.environ.get('DEBUG'))
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000', 'http://localhost:5085', 'http://127.0.0.1:8000',
-    'http://127.0.0.1:5085',
+    'http://127.0.0.1:'+os.environ.get("OPEN_PORT"),
     os.environ.get("OPEN_URL")+":"+os.environ.get("OPEN_PORT"),
 ]
 
@@ -205,26 +205,22 @@ STATICFILES_FINDERS = [
 
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-
-    'django_plotly_dash.finders.DashAssetFinder',
-    'django_plotly_dash.finders.DashComponentFinder',
-    'django_plotly_dash.finders.DashAppDirectoryFinder',
     
     "django_components.finders.ComponentsFileSystemFinder",
 ]
 
-PLOTLY_COMPONENTS = [
-
-    # Common components (ie within dash itself) are automatically added
-
-    # # django-plotly-dash components
-    # 'dpd_components',
-    # # static support if serving local assets
-    # 'dpd_static_support',
-
-    # Other components, as needed
-    'dash_bootstrap_components',
-]
+# PLOTLY_COMPONENTS = [
+#
+#     # Common components (ie within dash itself) are automatically added
+#
+#     # # django-plotly-dash components
+#     # 'dpd_components',
+#     # # static support if serving local assets
+#     # 'dpd_static_support',
+#
+#     # Other components, as needed
+#     'dash_bootstrap_components',
+# ]
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
