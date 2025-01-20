@@ -61,7 +61,7 @@ def annotation_page(request, annotation_id: int):
     """
     annotation = LabelMatrix.objects.get(id=annotation_id)
 
-    if annotation.created_by.id != request.user.id:
+    if not annotation.is_viewable_by(request.user):
         return
     
     rows, cols, cells = annotation.get_labels_with_2d_cells
@@ -100,14 +100,12 @@ def edit_annotation(request, annotation_id: int):
     """
     annotation = LabelMatrix.objects.get(id=annotation_id)
 
-    if annotation.created_by.id != request.user.id:
+    if not annotation.is_editable_by(request.user):
         return
     
     name = request.POST.get("label-layout-name")
     _, labels = load_labels_from_request(request)
-    
-    print(name)
-    
+
     keep_when_unused = request.POST.get('keep_when_unused') is not None
     public = request.POST.get('public') is not None
     
