@@ -48,7 +48,8 @@
                     {% endif %}
                   </td>
               {% endfor %}
-            
+                
+            {% if line.2 == request.user.id %}
               <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 <button type="button" id="deleteProductButton" data-drawer-target="drawer-delete-product-default"
                     data-drawer-show="drawer-delete-product-default" aria-controls="drawer-delete-product-default"
@@ -64,6 +65,7 @@
                     Delete
                 </button>
               </td>
+            {% endif %}
             </tr>
           {% endfor %}
           
