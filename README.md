@@ -9,7 +9,7 @@ provided. Deployment should always be done through Docker.
 # Installation
 
 First download or clone the repository.
-When running docker this all that's needed for installation.
+When running docker this all that's needed for 'installation'.
 
 ## Manual installation:
 
@@ -45,7 +45,7 @@ the values OPEN_PORT and OPEN_URL will need to be set appropriately.
 
 
 ## Through docker
-Running through Docker is simple, just
+Running and launching through Docker is simple, just
 `docker-compose up --build`
 It should then run at http://localhost:5085
 If to be found outside of a VM, it will run at OPEN_URL:OPEN_PORT an example is: https://example.com:0000
