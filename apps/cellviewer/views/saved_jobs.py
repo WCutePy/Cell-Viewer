@@ -25,9 +25,10 @@ def saved_jobs(request):
     Returns:
 
     """
-    jobs = SavedJob.objects.get_all_viewable_jobs(request.user).select_related("label_matrix")
-    fields = ["id", "label_matrix_id", "name", "label_matrix__matrix_name", "date", "dimension"]
-    headers = ["name", "annotation", "date", "dimension", ""]
+    jobs = SavedJob.objects.get_all_viewable_jobs(request.user).select_related("label_matrix").select_related("User")
+    fields = ["id", "label_matrix_id", "user",
+              "name", "label_matrix__matrix_name", "user__username","date", "dimension"]
+    headers = ["name", "annotation", "user", "date", "dimension", ""]
     jobs = jobs.values(*fields)
     
     data = (
