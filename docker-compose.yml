@@ -13,7 +13,7 @@ services:
         source: ./db.sqlite3
         target: /db.sqlite3
       - type : bind 
-        source: ./media
+        source: ${MEDIA_MOUNT}
         target: /media
 
   nginx:
