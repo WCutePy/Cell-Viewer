@@ -35,7 +35,7 @@
         {% fill "body" %}
           {% for line in jobs %}
             <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
-              {% for element in line|slice:"1:" %} <!-- keep in mind that entry 0 and 1 are id's, entry 2 is where the ifno comes. -->
+              {% for element in line|slice:"2:" %} <!-- keep in mind that entry 0 and 1 are id's, entry 2 is user id, entry 3 is where the ifno comes. -->
                   <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     {% if forloop.counter0 == 0 %}
                         <input type="checkbox" value="{{ line.0 }}" name="selected-jobs">
