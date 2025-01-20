@@ -296,5 +296,40 @@ class LabelMatrix(models.Model):
         rows, cols, cells = self.get_labels
         cells = [cells[i * len(cols):(i + 1) * len(cols)] for i in range(len(rows))]
         return rows, cols, cells
+    
+    def is_viewable_by(self, user: int | User):
+        """
+        Currently the request is that everything is viewable for
+        everyone. As such, this function is a placeholder
+        for more complex future logic.
 
+        If this logic never comes that is fine, however
+        it is better to keep it in mind, rather than
+        delete any checking that previously existed already.
+        Args:
+            user:
+
+        Returns:
+
+        """
+        if isinstance(user, User):
+            user = user.id
+        
+        return True
+    
+    def is_editable_by(self, user: int | User):
+        """
+        This too moves the check to a class based existence.
+        Only allows the user who made it to edit it.
+
+        Args:
+            user:
+
+        Returns:
+
+        """
+        if isinstance(user, User):
+            user = user.id
+        
+        return self.created_by.id == user
     
