@@ -1,4 +1,4 @@
-
+x
 {% load cellviewer_templatetags %}
 
 <!-- Additional info form -->
@@ -6,7 +6,7 @@
   <div class="w-full">
     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
     
-            <h1 class='flex justify-center text-2xl'> Metadata to use before loading</h1>
+            <h1 class='flex justify-center text-2xl text-gray-900 dark:text-white'> Metadata to use before loading</h1>
 
             <div class="grid grid-cols-3 gap-6">
                 <div class="col-span-6 sm:col-span-3">
@@ -35,7 +35,7 @@
                 {% endcomponent %}
             </div>
         
-            Lower substance cut-offs to save
+        <div class="text-sm font-medium text-gray-900 dark:text-white">Lower substance cut-offs to save</div>
             <div class="grid grid-cols-6 gap-6 my-6">
                 {% for substance in substances %}
                     <div class="col-span-6 sm:col-span-3">

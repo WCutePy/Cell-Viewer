@@ -11,7 +11,6 @@ from apps.cellviewer.util.index_helpers import load_and_save_processing
 
 
 def plot_insert_element(df: pl.dataframe, labels,
-                        pre_filter_substance_threshold: list[float] = None,
                         substance_threshold: list[float] = None,
                         include: list[str]=("all",),
                         name=None
@@ -38,20 +37,22 @@ def plot_insert_element(df: pl.dataframe, labels,
     parts together.
     However currently this is irrelevant, as there are two options.
     
-    It is able to do two steps of thresholds.
-    A pre load threshold, this is data which is not included,
-    and should not be included in the calculations. This is relevant
-    for when stored to the database.
-    However it is not sure if this is expected behaviour, so this
-    should be checked more thoroughly.
-    
     A filter threshold, this is the filter to apply to calculate the
     double positives.
+    
+    It creates multiple visualizations.
+    Histograms for each substance, showing the value distribution.
+    The page has sliders allowing you to set the value.
+    
+    Heatmap for the total count, the filtered count
+    and the amount of double positives.
+    
+    The page has buttons to allow downloading the files.
+    This also sends the content of said files
     
     Args:
         df: a polars dataframe
         labels: The labels in the list format [row, col, cells]
-        pre_filter_substance_threshold: a list with floats
         substance_threshold: a list with floats
         include: a list of strings for the elements.
             Leaving this empty gives all.
@@ -62,14 +63,8 @@ def plot_insert_element(df: pl.dataframe, labels,
         base_visualiation.html
 
     """
-    
-    if pre_filter_substance_threshold is None:
-        pre_filter_substance_threshold = (0, 0)
-    
-    original_df = df
-    df = filtered_polars_dataframe(df, pre_filter_substance_threshold)
-    
     substances = df.columns[3:]
+    amount_of_sites = df["Site"].max()
     
     if substance_threshold is None:
         substance_threshold = (0,) * len(substances)
@@ -79,13 +74,13 @@ def plot_insert_element(df: pl.dataframe, labels,
     
     if "all" in include or "hist" in include:
         histograms_data = []
-        for substance in substances:
+        for substance, threshold in zip(substances, substance_threshold):
             hist, max_value = create_hist(
                 df, substance
             )
             histograms_data.append(
-                (substance, hist.to_html(), max_value)
-            )
+                (substance, hist.to_html(), max_value, threshold)
+            ) # this order is important for the rendering.
         
         context.update({
             "histogram_data": histograms_data,
@@ -110,6 +105,7 @@ def plot_insert_element(df: pl.dataframe, labels,
         "sub_and_threshold_str": " and ".join(
             f"{a} for {b}" for a, b in zip(substance_threshold, substances)
         ),
+        "amount_of_sites": amount_of_sites,
         
         "heatmap_filtered_cell_counts": generate_heatmap_with_label(
             labels, filtered_well_count_matrix, "Count"
