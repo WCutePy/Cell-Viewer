@@ -1,7 +1,7 @@
 {% load static %}
 
 
-<h2 class="flex justify-center text-2xl">Heatmap of filtered cell counts per well</h2>
+<h2 class="flex justify-center text-2xl  text-gray-900 dark:text-white">Heatmap of filtered cell counts per well</h2>
 
 <div class="flex justify-end">
 <button id="filtered-cell-counts-btn" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm
@@ -13,9 +13,9 @@ px-5 py-2.5 my-2 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:foc
 {{ heatmap_filtered_cell_counts|safe }}
 </div>
 
-<h2 class="flex justify-center text-2xl">Heatmap of double positives per well</h2>
+<h2 class="flex justify-center text-2xl  text-gray-900 dark:text-white">Heatmap of double positives per well</h2>
 
-<p>The percentage of cells that are double positive ({{ substances_str }} above the set threshold)
+<p class="text-gray-900 dark:text-white">The percentage of cells that are double positive ({{ substances_str }} above the set threshold)
 Double positive cells have intensity levels above {{ sub_and_threshold_str }}</p>
 
 <div class="flex justify-end">
