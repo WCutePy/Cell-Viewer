@@ -121,7 +121,7 @@ def load_dash(request):
     if not name:
         name = "unnamed"
     
-    sub_context = plot_insert_element(df, labels, name=name)
+    sub_context = plot_insert_element(df, labels, experiment_name=name)
     
     context = {
         **sub_context

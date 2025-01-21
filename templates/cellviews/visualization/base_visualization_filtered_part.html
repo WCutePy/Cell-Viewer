@@ -42,11 +42,11 @@ Double positive cells have intensity levels above {{ sub_and_threshold_str }}</p
     var file_all = `{{ file_all|escapejs }}`;
 
     var button2 = document.getElementById("filtered-cell-counts-btn");
-    button2.addEventListener("click", fileDownloader(() => file_filtered_counts, `{{ name }}_filtered_cell_counts.csv`));
+    button2.addEventListener("click", fileDownloaderCsv(() => file_filtered_counts, `{{ name }}_filtered_cell_counts.csv`));
 
     var button3 = document.getElementById("double-positives-btn");
-    button3.addEventListener("click", fileDownloader(() => file_double_positives, `{{ name }}_double_positives.csv`));
+    button3.addEventListener("click", fileDownloaderCsv(() => file_double_positives, `{{ name }}_double_positives.csv`));
     
     var button4 = document.getElementById("all-btn");
-    button4.addEventListener("click", fileDownloader(() => file_all, `{{ name }}_all_data.csv`));
+    button4.addEventListener("click", fileDownloaderXlsx(() => file_all, `{{ name }}_all_data.xlsx`));
 </script>
