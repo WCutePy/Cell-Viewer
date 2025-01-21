@@ -40,7 +40,7 @@ def create_all_hist_html(df, columns):
 
 def generate_heatmap_with_label(labels, matrix, cell_value_text="", decimals=1):
     if decimals is not None:
-        matrix = round(matrix, 1)
+        matrix = round(matrix, decimals)
     
     label_text = [
         [f"Row: {labels[0][i]}<br>" \
