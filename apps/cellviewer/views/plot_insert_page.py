@@ -4,6 +4,8 @@ import polars as pl
 from django.shortcuts import render, HttpResponse
 
 from apps.cellviewer.models.FilteredFile import FilteredFile
+from apps.cellviewer.util.excel_writers import \
+    write_individual_analysis_to_binary
 from apps.cellviewer.util.plots import create_hist, generate_heatmap_with_label
 from apps.cellviewer.util.well_count_matrices import filtered_polars_dataframe, \
     generate_well_counts_and_percent
@@ -13,7 +15,7 @@ from apps.cellviewer.util.index_helpers import load_and_save_processing
 def plot_insert_element(df: pl.dataframe, labels,
                         substance_thresholds: list[float] = None,
                         include: list[str]=("all",),
-                        name=None
+                        experiment_name=None
                         ):
     """
     Does not directly render a view.
@@ -56,7 +58,7 @@ def plot_insert_element(df: pl.dataframe, labels,
         substance_thresholds: a list with floats
         include: a list of strings for the elements.
             Leaving this empty gives all.
-        name:
+        experiment_name:
     
     Returns:
         context dictionary to be used in combination with the
@@ -100,24 +102,20 @@ def plot_insert_element(df: pl.dataframe, labels,
             "file_count_matrix": well_count_matrix.to_csv(),
         })
         
+    matrix_explanations = [
+        "Well counts per well",
+        "Well counts filtered on the substance thresholds",
+        "Double positives above the thresholds"
+    ]
+    matrices = [well_count_matrix, filtered_well_count_matrix,
+                well_positives_percent]
     
-    full_file_content = f"""
-Original file name,file_name
-Experiment name,{name}
-Substance_thresholds:
-{"\n".join(f"{a},{b}" for a, b in zip(substances, substance_thresholds))}
-
-
-Well counts per well
-{well_count_matrix.to_csv()}
-
-Well counts filtered on the substance thresholds
-{filtered_well_count_matrix.to_csv()}
-
-Double positives above the thresholds.
-{well_positives_percent.to_csv()}
-"""
-    
+    excel_file_content = write_individual_analysis_to_binary(
+        experiment_name=experiment_name,
+        substance_names=substances, substance_thresholds=substance_thresholds,
+        matrix_explanations=matrix_explanations,
+        matrices=matrices
+    )
     
     context.update({
         "substances_str": " and ".join(substances),
@@ -136,10 +134,10 @@ Double positives above the thresholds.
         ).to_html(),
         "file_double_positives": well_positives_percent.to_csv(),
         
-        "file_all": full_file_content,
+        "file_all": excel_file_content,
         
         "job_id": "-1",
-        "name": name,
+        "name": experiment_name,
     })
     
     return context
@@ -198,7 +196,8 @@ def update_filtered_plots(request):
     """
     if request.POST.get("job_id") == "-1":
         files, name, labels = load_and_save_processing(request)
-        pre_filter_substance_threshold = None
+        
+        print(name)
         
         df = pl.read_csv(files[0])
         
@@ -228,7 +227,7 @@ def update_filtered_plots(request):
     substance_thresholds = [float(i) for i in
                            request.POST.getlist("substance_threshold")]
     
-    context = plot_insert_element(df, labels, substance_thresholds, name=name)
+    context = plot_insert_element(df, labels, substance_thresholds, experiment_name=name)
     return render(request,
                   "cellviews/visualization/base_visualization_filtered_part.html",
                   context)

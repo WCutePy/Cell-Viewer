@@ -7,8 +7,8 @@
             id="title_element">Histograms of {{ substances_str }} intensity values</h2>
         <div class="grid grid-cols-2 gap-6">
         {% for substance_name, histogram, max_value, threshold in histogram_data %} <!-- this order is rather arbitrary -->
-            <div>
-                <div id="histogram{{ substance_name }}" class="max-w-[60rem]">
+            <div class="max-w-[60rem]">
+                <div id="histogram{{ substance_name }}" >
                     {{ histogram|safe }}
                 </div>
                 
@@ -71,6 +71,6 @@ and it does not add to the javascript. -->
     var file_count_matrix = `{{ file_count_matrix|escapejs }}`;
 
     var button1 = document.getElementById("cell-counts-btn");
-    button1.addEventListener("click", fileDownloader(() => file_count_matrix, `{{ name }}_cell_counts.csv`));
+    button1.addEventListener("click", fileDownloaderCsv(() => file_count_matrix, `{{ name }}_cell_counts.csv`));
 
 </script>
