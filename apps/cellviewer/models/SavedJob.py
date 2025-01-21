@@ -115,12 +115,14 @@ class SavedJobManager(models.Manager):
         
         FilteredFile = apps.get_model("cellviewer", "FilteredFile")
         
-        for file, substance_thresholds in zip(to_save_files, files_substance_thresholds):
-            file.save()
+        for file, file_instance, substance_thresholds in zip(files, to_save_files, files_substance_thresholds):
+            file_instance.save()
             
             filtered_file = FilteredFile.objects.create(
                 job=saved_job,
-                saved_file=file,
+                saved_file=file_instance,
+                created_by_id=request.user.id,
+                original_file_name=file.name,
                 substance_thresholds=";".join(str(i) for i in substance_thresholds),
             )
             filtered_file.save()

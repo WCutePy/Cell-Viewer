@@ -2,6 +2,7 @@ from functools import reduce
 
 import pandas as pd
 import polars as pl
+from django.contrib.auth.models import User
 from django.db import models
 
 from apps.cellviewer.models.SavedJob import SavedJob
@@ -35,6 +36,8 @@ class FilteredFile(models.Model):
     
     job = models.ForeignKey(SavedJob, on_delete=models.CASCADE)
     saved_file = models.ForeignKey(SavedFile, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    original_file_name = models.TextField(null=True, default=None)
     substance_thresholds = models.TextField(null=True, default=None)
     
     @property

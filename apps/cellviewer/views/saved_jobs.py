@@ -4,7 +4,7 @@ from apps.cellviewer.models.SavedJob import SavedJob
 import polars as pl
 from functools import reduce
 
-from apps.cellviewer.views.plot_insert_page import plot_insert_element
+from apps.cellviewer.views.plot_insert_context import plot_insert_element
 
 
 def saved_jobs(request):
@@ -79,7 +79,8 @@ def display_job(request, job_id: int):
     substance_thresholds = filtered_file.get_substance_thresholds_as_list
     
     sub_context = plot_insert_element(
-        df, labels, experiment_name=job.name, substance_thresholds=substance_thresholds
+        df, labels, file_name=filtered_file.original_file_name,
+        experiment_name=job.name, substance_thresholds=substance_thresholds
     )
     
     context = {

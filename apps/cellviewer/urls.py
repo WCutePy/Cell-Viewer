@@ -2,7 +2,7 @@ from django.urls import path
 
 import apps.cellviewer.util.index_helpers
 from apps.cellviewer.views import index, saved_jobs, annotations, \
-    aggregate_jobs, plot_insert_page
+    aggregate_jobs, plot_insert_context
 
 app_name = "cellviewer"
 
@@ -20,5 +20,5 @@ urlpatterns = [
     path("annotation/<int:annotation_id>", annotations.annotation_page, name="annotation_page"),
     path("annotation/<int:annotation_id>/edit", annotations.edit_annotation, name='edit_annotation'),
     path("aggregate_jobs", aggregate_jobs.aggregate_jobs, name="aggregate_jobs"),
-    path("update_filtered_plots", plot_insert_page.update_filtered_plots, name="update_filtered_plots")
+    path("update_filtered_plots", plot_insert_context.update_filtered_plots, name="update_filtered_plots")
 ]
