@@ -43,6 +43,7 @@ def aggregate_jobs(request):
     matrices = []
     
     substance_names = []
+    amount_of_sites = []
     for filtered_file in filtered_files:
         df = filtered_file.load_polars_dataframe()
     
@@ -53,6 +54,7 @@ def aggregate_jobs(request):
             (well_count_matrix, well_count_matrix_percent)
         )
         substance_names.append(df.columns[3:])
+        amount_of_sites.append(df["Site"].max())
     
     mean_matrix = pd.DataFrame(0, index=matrices[0][0].index,
                                columns=matrices[0][0].columns)
@@ -83,6 +85,7 @@ def aggregate_jobs(request):
     excell_content = write_comparison_analysis_to_binary(
         file_names=individual_file_info[0],
         experiment_names=individual_file_info[1],
+        amount_of_sites=amount_of_sites,
         substance_names=substance_names,
         substance_thresholds=[f.get_substance_thresholds_as_list for f in filtered_files],
         individual_matrix_explanations=[["Double positive percent"] for f in filtered_files],
@@ -103,6 +106,7 @@ def aggregate_jobs(request):
     individual_file_info = list(zip(
         [f.original_file_name for f in filtered_files],
         [f.job.name for f in filtered_files],
+        amount_of_sites,
         reshaped_substance_info
     ))
 

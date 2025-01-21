@@ -119,6 +119,7 @@ def plot_insert_element(df: pl.dataframe, labels,
     excel_file_content = write_individual_analysis_to_binary(
         file_name=file_name,
         experiment_name=experiment_name,
+        amount_of_sites=amount_of_sites,
         substance_names=substances, substance_thresholds=substance_thresholds,
         matrix_explanations=matrix_explanations,
         matrices=matrices

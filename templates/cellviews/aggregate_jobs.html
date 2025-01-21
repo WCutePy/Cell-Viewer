@@ -19,10 +19,11 @@
           
       <div class="grid grid-cols-6 gap-6 my-6">
       <div class="col-span-6 sm:col-span-3">
-          {% for file_name, experiment_name, substance_info in individual_file_info %}
+          {% for file_name, experiment_name, sites, substance_info in individual_file_info %}
               <h3 class="text-gray-900 dark:text-white">Experiment {{ forloop.counter }}</h3>
               <div class="text-sm font-medium text-gray-900 dark:text-white">file name: {{ file_name }}</div>
               <div class="text-sm font-medium text-gray-900 dark:text-white">experiment name: {{ file_name }}</div>
+              <div class="text-sm font-medium text-gray-900 dark:text-white">sites: {{ sites }}</div>
               <div class="text-sm font-medium text-gray-900 dark:text-white">Substance <thresholds></thresholds>:</div>
               {% for sub_name, sub_thresh in substance_info %}
                 <div class="text-sm font-medium text-gray-900 dark:text-white">{{ sub_name }}: {{ sub_thresh }}</div>
