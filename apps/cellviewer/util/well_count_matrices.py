@@ -28,7 +28,7 @@ def generate_well_count_matrix(df: pl.DataFrame) -> pd.DataFrame:
 
 
 def generate_well_count_percent(well_count_matrix, filtered_well_count_matrix):
-    return (100 * filtered_well_count_matrix / well_count_matrix).fillna(0)
+    return round((100 * filtered_well_count_matrix / well_count_matrix),1).fillna(0)
 
 
 def generate_well_counts_and_percent(df, substance_thresholds):
