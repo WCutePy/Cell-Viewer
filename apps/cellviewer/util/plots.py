@@ -38,7 +38,7 @@ def create_all_hist_html(df, columns):
     return hists
 
 
-def generate_heatmap_with_label(labels, matrix, cell_value_text="", decimals=1):
+def generate_heatmap_with_label(labels, matrix, cell_value_text="", decimals=1, colorscale=None):
     if decimals is not None:
         matrix = round(matrix, decimals)
     
@@ -64,6 +64,13 @@ def generate_heatmap_with_label(labels, matrix, cell_value_text="", decimals=1):
     There might be a smoother way to solve this but I was not able to find one.
     """
     
+    if colorscale is None:
+        colorscale = [
+            [0, "white"],
+            [1, "pink"]
+        ] # this is how you set a custom gradient between two colors. 0 being
+         # the loewst value.
+    
     heatmap_fig = go.Figure(data=go.Heatmap(
         z=np.where(matrix == 0, None,
                    matrix)[::-1],
@@ -72,6 +79,7 @@ def generate_heatmap_with_label(labels, matrix, cell_value_text="", decimals=1):
         hoverinfo='text',
         text=label_text[::-1],
         texttemplate="%{z}",
+        colorscale=colorscale, # put a different colorscale here if you want a preset
     ))
     
     heatmap_fig.update_layout(
