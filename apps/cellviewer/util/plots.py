@@ -38,7 +38,10 @@ def create_all_hist_html(df, columns):
     return hists
 
 
-def generate_heatmap_with_label(labels, matrix, cell_value_text=""):
+def generate_heatmap_with_label(labels, matrix, cell_value_text="", decimals=1):
+    if decimals is not None:
+        matrix = round(matrix, 1)
+    
     label_text = [
         [f"Row: {labels[0][i]}<br>" \
          f"Col: {labels[1][j]}<br>" \
@@ -60,6 +63,7 @@ def generate_heatmap_with_label(labels, matrix, cell_value_text=""):
     It is required to invert everything related to the y column, as go.heatmap works from bottom to top.
     There might be a smoother way to solve this but I was not able to find one.
     """
+    
     heatmap_fig = go.Figure(data=go.Heatmap(
         z=np.where(matrix == 0, None,
                    matrix)[::-1],
