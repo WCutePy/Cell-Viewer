@@ -15,6 +15,7 @@ from apps.cellviewer.util.index_helpers import load_and_save_processing
 def plot_insert_element(df: pl.dataframe, labels,
                         substance_thresholds: list[float] = None,
                         include: list[str]=("all",),
+                        file_name=None,
                         experiment_name=None
                         ):
     """
@@ -52,12 +53,17 @@ def plot_insert_element(df: pl.dataframe, labels,
     The page has buttons to allow downloading the files.
     This also sends the content of said files
     
+    This function is used in three different places in "three different ways".
+    Please keep this in mind when making changes to it.
+    It's used in index, saved job, and within this file.
+    
     Args:
         df: a polars dataframe
         labels: The labels in the list format [row, col, cells]
         substance_thresholds: a list with floats
         include: a list of strings for the elements.
             Leaving this empty gives all.
+        file_name: The name of the file from which the data came
         experiment_name:
     
     Returns:
@@ -111,6 +117,7 @@ def plot_insert_element(df: pl.dataframe, labels,
                 well_positives_percent]
     
     excel_file_content = write_individual_analysis_to_binary(
+        file_name=file_name,
         experiment_name=experiment_name,
         substance_names=substances, substance_thresholds=substance_thresholds,
         matrix_explanations=matrix_explanations,
@@ -195,15 +202,8 @@ def update_filtered_plots(request):
 
     """
     if request.POST.get("job_id") == "-1":
-        files, name, labels = load_and_save_processing(request)
-        
-        print(name)
-        
+        files, name, labels, file_name = load_and_save_processing(request)
         df = pl.read_csv(files[0])
-        
-        if not name:
-            name = "unnamed"
-    
     else:
         # duplicates part with saved_jobs, find a better way
         # to do this.
@@ -223,11 +223,12 @@ def update_filtered_plots(request):
         df = filtered_file.load_polars_dataframe()
         
         name = job.name
+        file_name=filtered_file.original_file_name
     
     substance_thresholds = [float(i) for i in
                            request.POST.getlist("substance_threshold")]
     
-    context = plot_insert_element(df, labels, substance_thresholds, experiment_name=name)
+    context = plot_insert_element(df, labels, substance_thresholds, file_name=file_name, experiment_name=name)
     return render(request,
                   "cellviews/visualization/base_visualization_filtered_part.html",
                   context)

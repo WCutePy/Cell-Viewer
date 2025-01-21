@@ -1,3 +1,5 @@
+import os
+
 from django.http import HttpResponse
 
 from apps.cellviewer.components.label_matrix_input_fields import \
@@ -25,7 +27,12 @@ def load_and_save_processing(request):
     
     default_labels, labels = load_labels_from_request(request)
     
-    return files, name, labels
+    file_name = files[0].name
+    if not name:
+        name_without_extension, _ = os.path.splitext(file_name)
+        name = name_without_extension + "_experiment"
+    
+    return files, name, labels, file_name
 
 
 def load_labels_from_request(request):

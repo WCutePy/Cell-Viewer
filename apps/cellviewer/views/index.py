@@ -1,3 +1,4 @@
+import os
 import polars as pl
 from django.shortcuts import render, HttpResponse
 from apps.cellviewer.models.SavedJob import SavedJob
@@ -7,7 +8,7 @@ from apps.cellviewer.components.response_modal import ResponseModal
 import regex as re
 
 from apps.cellviewer.util.index_helpers import load_and_save_processing
-from apps.cellviewer.views.plot_insert_page import plot_insert_element
+from apps.cellviewer.views.plot_insert_context import plot_insert_element
 
 
 def index(request):
@@ -113,15 +114,17 @@ def load_dash(request):
     if preprocess_response is not None:
         return preprocess_response
     
-    files, name, labels = load_and_save_processing(request)
+    files, name, labels, file_name = load_and_save_processing(request)
     
     file = files[0]
     df = pl.read_csv(file)
     
-    if not name:
-        name = "unnamed"
+
     
-    sub_context = plot_insert_element(df, labels, experiment_name=name)
+    sub_context = plot_insert_element(
+        df, labels,
+        file_name=file_name,
+        experiment_name=name)
     
     context = {
         **sub_context
@@ -150,7 +153,7 @@ def save_job(request):
     if preprocess_response is not None:
         return preprocess_response
     
-    files, name, labels = load_and_save_processing(request)
+    files, name, labels, _ = load_and_save_processing(request)
     label_matrix_name = request.POST.get("label-layout-name")
     
     substance_cutoffs = request.POST.getlist("substance")

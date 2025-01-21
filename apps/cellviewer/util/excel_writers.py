@@ -39,13 +39,18 @@ def write_multiline_to_sheet(sheet: Worksheet, text: str,
 
 
 def write_individual_analysis_to_binary(
-        file_name: str = "unnamed", experiment_name: str = "unnamed",
+        file_name: str = None, experiment_name: str = None,
         substance_names: list[str] = None,
         substance_thresholds: list[float] = None,
         matrix_explanations: list[str] = None,
         matrices: list[pd.DataFrame] = None
 ):
     output = io.BytesIO()
+    
+    if file_name is None:
+        file_name = "unnamed"
+    if experiment_name is None:
+        experiment_name = file_name
     
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         workbook = writer.book
@@ -64,7 +69,7 @@ def write_individual_analysis_to_binary(
         """
         current_row = write_multiline_to_sheet(sheet, metadata, current_row)
         
-        current_row += 1
+        current_row += 2
         
         for text, matrix in zip(matrix_explanations, matrices):
             current_row = write_line_to_sheet(sheet, text, current_row)
