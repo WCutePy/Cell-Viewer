@@ -130,7 +130,7 @@ def plot_insert_element(df: pl.dataframe, labels,
         "file_filtered_counts": filtered_well_count_matrix.to_csv(),
         
         "heatmap_percentage": generate_heatmap_with_label(
-            labels, well_positives_percent, "Count"
+            labels, well_positives_percent, "Percent"
         ).to_html(),
         "file_double_positives": well_positives_percent.to_csv(),
         
