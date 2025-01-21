@@ -39,10 +39,12 @@ def write_multiline_to_sheet(sheet: Worksheet, text: str,
 
 
 def write_metadata(sheet, current_row, file_name, experiment_name,
+                    amount_of_sites,
                    substance_names, substance_thresholds):
     metadata = f"""
     Original file name\t{file_name}
     Experiment name\t{experiment_name}
+    Amount of sites\t{amount_of_sites}
     Substance thresholds:
     {"\n".join(f"{a}\t{b}" for a, b in zip(substance_names,
                                            substance_thresholds))}
@@ -64,6 +66,7 @@ def write_matrices(writer, sheet, current_row, matrix_explanations, matrices):
 
 def write_individual_analysis_to_binary(
         file_name: str = None, experiment_name: str = None,
+        amount_of_sites: int = None,
         substance_names: list[str] = None,
         substance_thresholds: list[float] = None,
         matrix_explanations: list[str] = None,
@@ -87,6 +90,7 @@ def write_individual_analysis_to_binary(
     Args:
         file_name:
         experiment_name:
+        amount_of_sites:
         substance_names:
         substance_thresholds:
         matrix_explanations:
@@ -111,7 +115,8 @@ def write_individual_analysis_to_binary(
         current_row = 1
         
         current_row = write_metadata(sheet, current_row, file_name,
-                                     experiment_name, substance_names,
+                                     experiment_name, amount_of_sites,
+                                     substance_names,
                                      substance_thresholds)
         
         current_row = write_matrices(writer, sheet, current_row,
@@ -123,13 +128,14 @@ def write_individual_analysis_to_binary(
 
 
 def write_comparison_analysis_to_binary(
-        file_names=list[str],
-        experiment_names=list[str],
-        substance_names=list[str], substance_thresholds=list[str],
-        individual_matrix_explanations=list[str],
-        individual_matrices=list[pd.DataFrame],
-        matrix_explanations=list[str],
-        matrices=list[pd.DataFrame]
+        file_names:list[str]=None,
+        experiment_names:list[str]=None,
+        amount_of_sites:list[int]=None,
+        substance_names:list[str]=None, substance_thresholds:list[str]=None,
+        individual_matrix_explanations:list[str]=None,
+        individual_matrices:list[pd.DataFrame]=None,
+        matrix_explanations:list[str]=None,
+        matrices:list[pd.DataFrame]=None
 ):
     
     """
@@ -159,14 +165,15 @@ def write_comparison_analysis_to_binary(
         
         current_row = 1
         
-        for file_name, experiment_name, substance_name, substance_threshold, \
+        for file_name, experiment_name, sites, substance_name, substance_threshold, \
                 ind_matrix_explanations, ind_matrices \
-                in zip(file_names, experiment_names, substance_names,
+                in zip(file_names, experiment_names, amount_of_sites, substance_names,
                        substance_thresholds, individual_matrix_explanations,
                        individual_matrices):
                        
             current_row = write_metadata(sheet, current_row, file_name,
-                                         experiment_name, substance_name,
+                                         experiment_name, sites,
+                                         substance_name,
                                          substance_threshold)
             
             current_row = write_matrices(writer, sheet, current_row,
