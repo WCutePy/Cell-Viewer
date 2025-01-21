@@ -38,6 +38,30 @@ def write_multiline_to_sheet(sheet: Worksheet, text: str,
     return row_index + 1
 
 
+def write_metadata(sheet, current_row, file_name, experiment_name,
+                   substance_names, substance_thresholds):
+    metadata = f"""
+    Original file name\t{file_name}
+    Experiment name\t{experiment_name}
+    Substance thresholds:
+    {"\n".join(f"{a}\t{b}" for a, b in zip(substance_names,
+                                           substance_thresholds))}
+    """
+    current_row = write_multiline_to_sheet(sheet, metadata, current_row)
+    
+    return current_row + 2
+
+
+def write_matrices(writer, sheet, current_row, matrix_explanations, matrices):
+    for text, matrix in zip(matrix_explanations, matrices):
+        current_row = write_line_to_sheet(sheet, text, current_row)
+        
+        matrix.to_excel(writer, index=True, sheet_name=sheet.title,
+                        startrow=current_row - 1)
+        current_row += matrix.shape[0] + 1 + 2
+    return current_row
+
+
 def write_individual_analysis_to_binary(
         file_name: str = None, experiment_name: str = None,
         substance_names: list[str] = None,
@@ -45,6 +69,32 @@ def write_individual_analysis_to_binary(
         matrix_explanations: list[str] = None,
         matrices: list[pd.DataFrame] = None
 ):
+    """
+    Writes the content of an excell file
+    using openpyxl as the engine, through
+    pandas to Easily write the pandas dataframes to it.
+    
+    This writes the metadata first, followed up by the
+    matrices that must be written into it.
+    
+    Everything is written to one sheet.
+    It's possible to write in multiple sheets but that
+    is currently not done.
+    
+    It dumps the content into latin1 format.
+    This is so JavaScript can natively work with it.
+    
+    Args:
+        file_name:
+        experiment_name:
+        substance_names:
+        substance_thresholds:
+        matrix_explanations:
+        matrices:
+
+    Returns:
+
+    """
     output = io.BytesIO()
     
     if file_name is None:
@@ -60,26 +110,73 @@ def write_individual_analysis_to_binary(
         
         current_row = 1
         
-        metadata = f"""
-        Original file name\t{file_name}
-        Experiment name\t{experiment_name}
-        Substance thresholds:
-        {"\n".join(f"{a}\t{b}" for a, b in zip(substance_names,
-                                               substance_thresholds))}
-        """
-        current_row = write_multiline_to_sheet(sheet, metadata, current_row)
+        current_row = write_metadata(sheet, current_row, file_name,
+                                     experiment_name, substance_names,
+                                     substance_thresholds)
         
-        current_row += 2
-        
-        for text, matrix in zip(matrix_explanations, matrices):
-            current_row = write_line_to_sheet(sheet, text, current_row)
-            
-            matrix.to_excel(writer, index=True, sheet_name=sheet_name,
-                            startrow=current_row - 1)
-            current_row += matrix.shape[0] + 1 + 2
+        current_row = write_matrices(writer, sheet, current_row,
+                                     matrix_explanations, matrices)
     
     excel_data = output.getvalue()
     excel_data = excel_data.decode("latin1")
     return excel_data
-    
 
+
+def write_comparison_analysis_to_binary(
+        file_names=list[str],
+        experiment_names=list[str],
+        substance_names=list[str], substance_thresholds=list[str],
+        individual_matrix_explanations=list[str],
+        individual_matrices=list[pd.DataFrame],
+        matrix_explanations=list[str],
+        matrices=list[pd.DataFrame]
+):
+    
+    """
+    Writes out the
+    
+    Args:
+        file_names:
+        experiment_names:
+        substance_names:
+        substance_thresholds:
+        individual_matrix_explanations:
+        individual_matrices:
+        matrix_explanations:
+        matrices:
+
+    Returns:
+
+    """
+    
+    output = io.BytesIO()
+    
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        workbook = writer.book
+        sheet_name = "Sheet1"
+        workbook.create_sheet(title=sheet_name)
+        sheet = workbook[sheet_name]
+        
+        current_row = 1
+        
+        for file_name, experiment_name, substance_name, substance_threshold, \
+                ind_matrix_explanations, ind_matrices \
+                in zip(file_names, experiment_names, substance_names,
+                       substance_thresholds, individual_matrix_explanations,
+                       individual_matrices):
+                       
+            current_row = write_metadata(sheet, current_row, file_name,
+                                         experiment_name, substance_name,
+                                         substance_threshold)
+            
+            current_row = write_matrices(writer, sheet, current_row,
+                                         ind_matrix_explanations, ind_matrices)
+        
+        current_row = write_line_to_sheet(sheet, "Aggregated comparison", current_row)
+        
+        current_row = write_matrices(writer, sheet, current_row,
+                                     matrix_explanations, matrices)
+    
+    excel_data = output.getvalue()
+    excel_data = excel_data.decode("latin1")
+    return excel_data

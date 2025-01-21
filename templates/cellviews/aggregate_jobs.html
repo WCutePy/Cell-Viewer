@@ -8,12 +8,38 @@
 <div class="px-4 pt-6">
       <div
         class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-        
-          Mean percentage of all files
-         {{ mean_heatmap | safe }}
+          
+      <h1 class="flex justify-center text-2xl text-gray-900 dark:text-white">Multiple experiment analysis</h1>
+      
+        <div class="flex justify-end">
+        <button id="analysis-btn" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm
+        px-5 py-2.5 my-2 text-center dark:bg-blue-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+            Download analysis xlsx</button>
+        </div>
+          
+      <div class="grid grid-cols-6 gap-6 my-6">
+      <div class="col-span-6 sm:col-span-3">
+          {% for file_name, experiment_name, substance_info in individual_file_info %}
+              <h3 class="text-gray-900 dark:text-white">Experiment {{ forloop.counter }}</h3>
+              <div class="text-sm font-medium text-gray-900 dark:text-white">file name: {{ file_name }}</div>
+              <div class="text-sm font-medium text-gray-900 dark:text-white">experiment name: {{ file_name }}</div>
+              <div class="text-sm font-medium text-gray-900 dark:text-white">Substance <thresholds></thresholds>:</div>
+              {% for sub_name, sub_thresh in substance_info %}
+                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ sub_name }}: {{ sub_thresh }}</div>
+              {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+      
+          <h1 class="flex justify-center text-2xl text-gray-900 dark:text-white">Mean percentage of all files</h1>
+         <div class="max-w-[60rem]">
+          {{ mean_heatmap | safe }}
+         </div>
             
-          Standard deviation of the percentage of all files
-        {{ std_heatmap | safe }}
+          <h1 class="flex justify-center text-2xl text-gray-900 dark:text-white">Standard deviation of the percentage of all files</h1>
+            <div class="max-w-[60rem]">
+          {{ std_heatmap | safe }}
+            </div>
       </div>
 </div>
 
@@ -22,5 +48,17 @@
   </div>
 
 </main>
+    
+<script src="{% static 'assets/download-file.js' %}"></script>
+<script>
+    var analysis_content = `{{ excell_content|escapejs }}`;
 
+    var button1 = document.getElementById("analysis-btn");
+    button1.addEventListener("click", fileDownloaderXlsx(() => analysis_content, `{{ name }}_analysis`));
+
+</script>
+    
 {% endblock content %}
+{% block extra_js %}
+
+{% endblock %}
