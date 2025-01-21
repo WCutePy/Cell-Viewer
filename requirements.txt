@@ -4,6 +4,7 @@ python-dotenv==1.0.1
 str2bool==1.1
 
 # Utils
+openpyxl==3.1.5
 django-debug-toolbar==4.2.0
 Pillow==10.0.1
 polars==1.11.0
