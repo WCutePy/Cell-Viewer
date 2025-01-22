@@ -10,7 +10,7 @@ services:
       - web_network
     volumes:
       - type: bind
-        source: ./db.sqlite3
+        source: ${DB_MOUNT}/db.sqlite3
         target: /db.sqlite3
       - type : bind 
         source: ${MEDIA_MOUNT}
