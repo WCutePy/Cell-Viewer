@@ -71,15 +71,19 @@ def load_labels_from_request(request):
     return (tuple(default_rows), tuple(default_cols)), labels
 
 
-def load_stored_label_matrix(request):
+def stored_label_matrix_as_html(request):
     """
-    Helper function
-    
     Generates a new label matrix for annotation with
     preselected inputs based on a label matrix loaded from
     the database.
     It's done by generating it in python to require less javascript
     to swap the elements individually.
+    
+    Generates the html for this.
+    This is currently in util, but something accessed by
+    a url shouldn't be in util. This was put here accidentally.
+    Consider moving this in the future.
+    
     Args:
         request:
 
