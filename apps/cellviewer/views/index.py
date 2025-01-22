@@ -119,8 +119,6 @@ def load_dash(request):
     file = files[0]
     df = pl.read_csv(file)
     
-
-    
     sub_context = plot_insert_element(
         df, labels,
         file_name=file_name,
@@ -143,6 +141,11 @@ def save_job(request):
     
     All the inputs on the index page are used to save teh job.
     
+    Currently this doens't display very extensive error messages
+    if something goes wrong and why.
+    This could be added. Right now it will just dump the python error
+    if there is no explicit error setup.
+    
     Args:
         request:
 
@@ -160,22 +163,28 @@ def save_job(request):
     substance_cutoffs = [substance_cutoffs] # this is because multi file is not
     # done, but savedjob excepts multi file
     
-    saved = SavedJob.objects.create(
-        request,
-        files,
-        substance_cutoffs,
-        name,
-        labels,
-        label_matrix_name
-    )
-    
-    html_content = ResponseModal.render(
-        args=("Saved experiment with configuration successfully",
-              f"You can find the saved version at <a "
-              f"href='http://127.0.0.1:8000/saved_jobs/{saved.id}'>saved "
-              f"job</a>")
-    )
-    
+    try:
+        saved = SavedJob.objects.create(
+            request,
+            files,
+            substance_cutoffs,
+            name,
+            labels,
+            label_matrix_name
+        )
+        
+        html_content = ResponseModal.render(
+            args=("Saved experiment with configuration successfully",
+                  f"You can find the saved version at <a "
+                  f"href='http://127.0.0.1:8000/saved_jobs/{saved.id}'>saved "
+                  f"job</a>")
+        )
+        
+    except Exception as e:
+        html_content = ResponseModal.render(
+            args=(f"Something went wrong:\n {e} \n Please let the team know if this is unexpected:")
+        )
+        
     return HttpResponse(html_content)
 
 

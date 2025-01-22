@@ -11,7 +11,7 @@ urlpatterns = [
     path("input_data", index.index_follow_up_input),
     path("load_dash", index.load_dash),
     path("load_stored_label_matrix",
-         apps.cellviewer.util.index_helpers.load_stored_label_matrix),
+         apps.cellviewer.util.index_helpers.stored_label_matrix_as_html),
     path("save_job", index.save_job),
     path("saved_jobs", saved_jobs.saved_jobs, name="saved_jobs"),
     path("saved_jobs/<int:job_id>/", saved_jobs.display_job),
