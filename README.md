@@ -38,6 +38,7 @@ Then simply
 The following commands will also need to be done the first time.
 `py manage.py migrate`
 `python manage.py collectstatic --no-input`
+`python manage.py ensure_adminuser --no-input`
 
 To be able to make changes to the tailwind css, one needs to install
 `npm install`
