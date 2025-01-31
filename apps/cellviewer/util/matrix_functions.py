@@ -7,8 +7,16 @@ def filtered_polars_dataframe(
         df: pl.DataFrame, substance_thresholds: list[float]
 ) -> pl.DataFrame:
     """
-    Filters out values that are lower than any of the thresholds.
-    This means that the threshold is INCLUDED
+    Filters out rows that have a lower value than any of the thresholds.
+    This means that the threshold is INCLUSIVE. If the threshold is
+    2, a value of 2 will be retained, and 1.99 will be filtered out.
+    
+    This function currently just loops over the thresholds to
+    create the filter. If there are less thresholds than the
+    amount of different substances in the dataset, it will filter
+    on the first n substances.
+    If there are more it will fail.
+    
     Args:
         df:
         substance_thresholds:
@@ -27,6 +35,38 @@ def filtered_polars_dataframe(
 
 
 def calculate_well_count_matrix(df: pl.DataFrame) -> pd.DataFrame:
+    """
+    Calculates the well count matrix.
+    
+    It expects a polars DataFrame, and returns a pandas DataFrame.
+    This can be a bit confusing.
+    
+    This is done because polars, to my knowledge, when it comes
+    to loading and this type of operation is a bit faster than
+    pandas. (More testing would be needed to proof if this is
+    consistently true for the current Pandas version)
+    However Polars does not play nice with the matrix format
+    that is required to be used for the application.
+    
+    As such this conversion is made after the heavy lifting has
+    been done by Polars.
+    
+    It creates a Matrix in the format:
+    
+    cols  02  03
+    row
+    B      1   0
+    C      0   1
+    
+    It makes every combination of all letters and numbers that appear.
+    Well combinations that are missing, will be defaulted to zero.
+    
+    Args:
+        df:
+
+    Returns:
+
+    """
     well_counts = df.group_by("Well").count().to_pandas()
     
     well_counts["row"] = [well[0] for well in well_counts["Well"]]
@@ -39,10 +79,51 @@ def calculate_well_count_matrix(df: pl.DataFrame) -> pd.DataFrame:
 
 
 def calculate_well_count_percent(well_count_matrix, filtered_well_count_matrix):
+    """
+    Calculates the percentage of two well count matrices.
+    
+    It is not required for the matrices to be the exact same shape,
+    however it is intended for this to be the case.
+    
+    Percentages are between 0 and 100 %
+    Any values that are missing, or NaN, will be filled to zero, as it
+    might complicate other calculations relying on this data
+    if they are NaN.
+    
+    Args:
+        well_count_matrix:
+        filtered_well_count_matrix:
+
+    Returns:
+
+    """
     return (100 * filtered_well_count_matrix / well_count_matrix).fillna(0)
 
 
 def calculate_well_counts_and_percent(df, substance_thresholds):
+    """
+    Gets the well count, filtered well count and double positive
+    percentage all from a singular function call, wrapping together
+    multiple functions from this file.
+    
+    A note is that, it's possible in some cases for the filtering
+    to filter out for example all Wells with the letter B,
+    In that case calculating the well count would not have
+    wells with the letter B appear at all.
+    The original well count matrix is used to adjust for this,
+    so no Well combinations can be missed in the output.
+    
+    This could be made into a separate function,
+    however it's not intended to do anything without this combined
+    function, so that might not be necessary.
+    
+    Args:
+        df:
+        substance_thresholds:
+
+    Returns:
+
+    """
     df_filtered = filtered_polars_dataframe(
         df, substance_thresholds
     )
