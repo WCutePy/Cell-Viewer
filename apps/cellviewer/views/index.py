@@ -159,7 +159,7 @@ def save_job(request):
     files, name, labels, _ = load_and_save_processing(request)
     label_matrix_name = request.POST.get("label-layout-name")
     
-    substance_cutoffs = request.POST.getlist("substance")
+    substance_cutoffs = request.POST.getlist("substance_threshold")
     substance_cutoffs = [substance_cutoffs] # this is because multi file is not
     # done, but savedjob excepts multi file
     
@@ -177,7 +177,9 @@ def save_job(request):
             args=("Saved experiment with configuration successfully",
                   f"You can find the saved version at <a "
                   f"href='http://127.0.0.1:8000/saved_jobs/{saved.id}'>saved "
-                  f"job</a>")
+                  f"job</a>"
+                  f"<br>Used the thresholds: {', '.join(substance_cutoffs[0])}"
+                  )
         )
         
     except Exception as e:
