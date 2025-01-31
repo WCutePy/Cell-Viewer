@@ -66,10 +66,12 @@ def generate_heatmap_with_label(labels, matrix, cell_value_text="", decimals=1, 
     
     if colorscale is None:
         colorscale = [
-            [0, "white"],
-            [1, "pink"]
+            [0, 'rgb(220, 220, 220)'],
+            [1, "rgb(0, 0, 139)"]
         ] # this is how you set a custom gradient between two colors. 0 being
          # the loewst value.
+    
+    # colorscale = "gray"
     
     heatmap_fig = go.Figure(data=go.Heatmap(
         z=np.where(matrix == 0, None,

@@ -7,8 +7,8 @@ from apps.cellviewer.models.FilteredFile import FilteredFile
 from apps.cellviewer.util.excel_writers import \
     write_individual_analysis_to_binary
 from apps.cellviewer.util.plots import create_hist, generate_heatmap_with_label
-from apps.cellviewer.util.well_count_matrices import filtered_polars_dataframe, \
-    generate_well_counts_and_percent
+from apps.cellviewer.util.matrix_functions import filtered_polars_dataframe, \
+    calculate_well_counts_and_percent
 from apps.cellviewer.util.index_helpers import load_and_save_processing
 
 
@@ -96,7 +96,7 @@ def plot_insert_element(df: pl.dataframe, labels,
     
     well_count_matrix, filtered_well_count_matrix, \
         well_positives_percent = (
-        generate_well_counts_and_percent(
+        calculate_well_counts_and_percent(
             df, substance_thresholds
         ))
     
@@ -155,7 +155,7 @@ def update_filtered_plots(request):
     """
     Renders the page element of the filtered plots.
     Loads base_visualization_filtered_part.html
-    Sending in the context only the rquired information.
+    Sending in the context only the required information.
     
     It is possible to call from both a not saved,
     and a saved file.
@@ -182,7 +182,7 @@ def update_filtered_plots(request):
     the client side, and that is okay. This is as, to more performant
     than using Dash is, and more performance is currently not required.
     
-    For better performance, and for more customizability,
+    NOTE For better performance, and for more customizability,
     all visualization, or atleast the visualizations that require
     a great deal of interaction or customizability should be rendered
     or updated through javascript.
@@ -192,6 +192,9 @@ def update_filtered_plots(request):
     application in learning curve, and it would take me more time
     to rewrite from Dash to JavaScript than putting this
     together.
+    
+    NOTE When making plots through JavaScript, this whole function,
+    and the routes related to this can be removed.
     
     The updated section is loaded through HTMX. A simple way
     to update a section of a page without JavaScript.

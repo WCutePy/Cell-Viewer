@@ -7,8 +7,8 @@ from django.db import models
 
 from apps.cellviewer.models.SavedJob import SavedJob
 from apps.cellviewer.models.SavedFile import SavedFile
-from apps.cellviewer.util.well_count_matrices import \
-    generate_well_counts_and_percent
+from apps.cellviewer.util.matrix_functions import \
+    calculate_well_counts_and_percent
 
 
 class FilteredFile(models.Model):
@@ -65,7 +65,7 @@ class FilteredFile(models.Model):
         
         well_count_matrix, filtered_well_count_matrix, \
             well_count_matrix_percent = \
-            generate_well_counts_and_percent(
+            calculate_well_counts_and_percent(
                 df, substance_thresholds
             )
         
