@@ -3,12 +3,42 @@ from apps.cellviewer.models.FilteredFile import FilteredFile
 
 import pandas as pd
 
+from apps.cellviewer.util.matrix_functions import \
+    calculate_mean_across_each_well, \
+    calculate_standard_deviation_across_each_well
 from apps.cellviewer.util.plots import generate_heatmap_with_label
 from apps.cellviewer.util.excel_writers import write_comparison_analysis_to_binary
 
 
 def aggregate_jobs(request):
     """
+    
+    A page that displays an aggregation of multiple
+    experiments.
+    
+    This page displays multiple things:
+     - The mean of the double positives percentage of each
+        well across the experiments
+     - The standard deviation of the double positive percentages of
+        each well across the experiments
+     
+    This page calculates and uses for the file, but does not display:
+     - The double positives of each well for each experiment individually
+    
+    The progress of what the code does
+    This page at first calculates for each experiment the
+    cell count matrix and the filtered cell count matrix.
+    It then calculates the double positive matrix.
+    
+    Using the double positive matrices of all the files, it calculates
+    the mean of each well across the experiments.
+    Using the double positive matrices and the mean, it
+    calculates the standard deviation.
+    
+    It creates a file in excell format that displays the metadata
+    about each individual experiment, and the aggregated information
+    that is displayed.
+    For this it uses the specific function that does this.
     
     Args:
         request:
@@ -56,21 +86,11 @@ def aggregate_jobs(request):
         substance_names.append(df.columns[3:])
         amount_of_sites.append(df["Site"].max())
     
-    mean_matrix = pd.DataFrame(0, index=matrices[0][0].index,
-                               columns=matrices[0][0].columns)
+    mean_matrix = calculate_mean_across_each_well([a for _, a in matrices])
     
-    for well_count_matrix, well_count_matrix_percent in matrices:
-        mean_matrix += well_count_matrix_percent
-    
-    mean_matrix /= len(matrices)
-    
-    std_matrix = pd.DataFrame(0, index=matrices[0][0].index,
-                              columns=matrices[0][0].columns)
-    
-    for well_count_matrix, well_count_matrix_percent in matrices:
-        std_matrix += (well_count_matrix_percent - mean_matrix) ** 2
-    
-    std_matrix = (std_matrix / len(matrices)) ** 0.5
+    std_matrix = calculate_standard_deviation_across_each_well(
+        [a for _, a in matrices], mean_matrix
+    )
     
     mean_heatmap = generate_heatmap_with_label(labels, mean_matrix, "Mean percentage")
     
