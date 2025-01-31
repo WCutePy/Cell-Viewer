@@ -92,7 +92,7 @@ def aggregate_jobs(request):
         [a for _, a in matrices], mean_matrix
     )
     
-    mean_heatmap = generate_heatmap_with_label(labels, mean_matrix, "Mean percentage")
+    mean_heatmap = generate_heatmap_with_label(labels, mean_matrix, "Mean percentage", gradient_range=(0, 100))
     
     std_heatmap = generate_heatmap_with_label(labels, std_matrix, "Std")
     
