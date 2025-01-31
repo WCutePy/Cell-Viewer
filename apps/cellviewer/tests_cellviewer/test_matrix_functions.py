@@ -219,6 +219,36 @@ class TestMatrixFunctions(TestCase):
             check_dtype=False
         )
     
+    def test_calculate_well_counts_and_percent_retain_wells_on_aggressive_filtering(self):
+        """
+        Tests that if the thresholds would filter out all the entries
+        on all wells, or even only on a few wells, the filtered
+        matrix will still retain each well with a zero
+        
+        This is important as the visualization requires this to
+        be consistent.
+        """
+        df = pl.DataFrame({
+            "Well": ["B02", "C02", "B03", "C03"],
+            "Site": [1, 1, 1, 1],
+            "Cell": [1, 2, 3, 4],
+            "OCT4": [0, 0, 0, 0]
+        })
+        
+        expected_filtered_well_count_matrix = pd.DataFrame({
+            "02": [0, 0],
+            "03": [0, 0]
+        }, index=["B", "C"]).rename_axis(index="row", columns="cols")
+        
+        _, filtered_well_count_matrix, _ = \
+            calculate_well_counts_and_percent(df, [1])
+        
+        pd.testing.assert_frame_equal(
+            filtered_well_count_matrix,
+            expected_filtered_well_count_matrix,
+            check_dtype=False
+        )
+    
     def test_calculate_mean_across_each_well_positive_values(self):
         """
         Also tests that rename axis is preserved through the
@@ -231,7 +261,7 @@ class TestMatrixFunctions(TestCase):
             1: [20, 60],
             2: [40, 80]
         }, index=["A", "B"]).rename_axis(index="row", columns="cols")
-
+        
         matrix_b = pd.DataFrame({
             1: [30, 50],
             2: [0, 10]
@@ -240,7 +270,8 @@ class TestMatrixFunctions(TestCase):
         expected_result = pd.DataFrame({
             1: [25, 55],
             2: [20, 45]
-        }, index=["A", "B"], dtype="float64").rename_axis(index="row", columns="cols")
+        }, index=["A", "B"], dtype="float64").rename_axis(index="row",
+                                                          columns="cols")
         
         result = calculate_mean_across_each_well([matrix_a, matrix_b])
         pd.testing.assert_frame_equal(result, expected_result)
@@ -293,10 +324,11 @@ class TestMatrixFunctions(TestCase):
         
         result = calculate_standard_deviation_across_each_well(
             [matrix_a, matrix_b], matrix_mean)
- 
+        
         pd.testing.assert_frame_equal(result, expected_result)
     
-    def test_calculate_standard_deviation_across_each_well_realistic_example(self):
+    def test_calculate_standard_deviation_across_each_well_realistic_example(
+            self):
         """
         Tests if the result of the calculation is correct.
 
@@ -352,5 +384,5 @@ class TestMatrixFunctions(TestCase):
         
         result = calculate_standard_deviation_across_each_well(
             [matrix_a, matrix_b], matrix_mean)
-            
+        
         pd.testing.assert_frame_equal(result, expected_result)
