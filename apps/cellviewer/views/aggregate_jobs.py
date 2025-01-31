@@ -108,10 +108,10 @@ def aggregate_jobs(request):
         amount_of_sites=amount_of_sites,
         substance_names=substance_names,
         substance_thresholds=[f.get_substance_thresholds_as_list for f in filtered_files],
-        individual_matrix_explanations=[["Double positive percent"] for f in filtered_files],
-        individual_matrices=[[percent] for count, percent in matrices],
+        individual_matrix_explanations=[["Cell count", "Double positive percent"] for f in filtered_files],
+        individual_matrices=[[count, percent] for count, percent in matrices],
         matrix_explanations=["Mean of double positive percentages",
-                             "Standard deviation of double positive percentages"],
+                             "Standard deviation of double positive percentages calculated through Population standard deviation"],
         matrices=[mean_matrix, std_matrix]
     )
     
