@@ -51,7 +51,7 @@ def calculate_well_counts_and_percent(df, substance_thresholds):
     
     filtered_well_count_matrix = calculate_well_count_matrix(
         df_filtered
-    )
+    ).reindex(index=well_count_matrix.index, columns=well_count_matrix.columns, fill_value=0)
     
     well_count_matrix_percent = calculate_well_count_percent(
         well_count_matrix, filtered_well_count_matrix)
