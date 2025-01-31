@@ -184,7 +184,8 @@ def save_job(request):
         
     except Exception as e:
         html_content = ResponseModal.render(
-            args=(f"Something went wrong:\n {e} \n Please let the team know if this is unexpected:")
+            args=(f"Something went wrong,",
+                  f"\n Please let the team know if this is unexpected: {e}")
         )
         
     return HttpResponse(html_content)

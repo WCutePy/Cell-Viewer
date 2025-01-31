@@ -54,6 +54,10 @@ class SavedJobManager(models.Manager):
         SavedFile throws a PermissionError if there is not enough
         space available to the user to write the file.
         
+        Checks that the thresholds are present, and are valid values.
+        If it is not present, or is not possible to convert to
+        floats, it will set the threshold as zero.
+        
         Currently, any creates that happen in the middle if an error is raised remain
         There will be objects created that are "orphaned"
         Args:
@@ -70,14 +74,17 @@ class SavedJobManager(models.Manager):
         to_save_files = []
         first_dimension, next_dimension = (0, 0), (0, 0)
         
-        current_users_size_in_b = SavedJob.objects.get_users_used_file_storage(request.user)
+        current_users_size_in_b = SavedJob.objects.get_users_used_file_storage(
+            request.user)
         
         for file in files:
             initialized_file_object, current_users_size_in_b = (
-                SavedFile.objects.create(request, file, current_users_size_in_b)
+                SavedFile.objects.create(request, file,
+                                         current_users_size_in_b)
             )
             
-            next_dimension = (initialized_file_object.matrix_row_count, initialized_file_object.matrix_col_count)
+            next_dimension = (initialized_file_object.matrix_row_count,
+                              initialized_file_object.matrix_col_count)
             if next_dimension != first_dimension and first_dimension != (0, 0):
                 raise ValueError(f"DataFrames have different shapes\n"
                                  f"first_dimension: {first_dimension}\n"
@@ -85,17 +92,19 @@ class SavedJobManager(models.Manager):
                                  )
             
             if (len(labels[0]), len(labels[1])) != next_dimension:
-                raise ValueError(f"The label and file content dimension does not match\ndimensions:"
-                                 f"label: {(len(labels[0]), len(labels[1]))}\n"
-                                 f"dimension: {first_dimension}"
-                                 )
+                raise ValueError(
+                    f"The label and file content dimension does not match\ndimensions:"
+                    f"label: {(len(labels[0]), len(labels[1]))}\n"
+                    f"dimension: {first_dimension}"
+                    )
             
             first_dimension = next_dimension
             to_save_files.append(initialized_file_object)
-
+        
         if not label_matrix_name and name:
             label_matrix_name = f"{name}_annotation"
-        label_matrix = LabelMatrix.objects.create(request, *labels, label_matrix_name)
+        label_matrix = LabelMatrix.objects.create(request, *labels,
+                                                  label_matrix_name)
         
         saved_job = super().create(
             user_id=request.user.id,
@@ -115,7 +124,19 @@ class SavedJobManager(models.Manager):
         
         FilteredFile = apps.get_model("cellviewer", "FilteredFile")
         
-        for file, file_instance, substance_thresholds in zip(files, to_save_files, files_substance_thresholds):
+        for file, file_instance, substance_thresholds in \
+                zip(files, to_save_files, files_substance_thresholds):
+            
+            try:
+                if not len(substance_thresholds):
+                    raise ValueError
+                [float(i) for i in substance_thresholds]
+            except ValueError:
+                file.open()
+                header = str(file.readline())
+                substance_thresholds = [0] * (len(header.split(",")) - 3)
+                file.close()
+            
             file_instance.save()
             
             filtered_file = FilteredFile.objects.create(
@@ -123,10 +144,11 @@ class SavedJobManager(models.Manager):
                 saved_file=file_instance,
                 created_by_id=request.user.id,
                 original_file_name=file.name,
-                substance_thresholds=";".join(str(i) for i in substance_thresholds),
+                substance_thresholds=";".join(
+                    str(i) for i in substance_thresholds),
             )
             filtered_file.save()
-            
+        
         # saved_job.files.add(*to_save_files)
         
         return saved_job
@@ -152,7 +174,7 @@ class SavedJobManager(models.Manager):
 
         """
         return self.all()
-        
+    
     def get_users_used_file_storage(self, user: User | int) -> int:
         """
         Determines an estimation of a users used file storage in bytes.
@@ -174,7 +196,8 @@ class SavedJobManager(models.Manager):
             user = user.id
         unique_files = self.filter(user_id=user).values("files").distinct()
         storage = SavedFile.objects.filter(id__in=unique_files) \
-            .aggregate(models.Sum("storage_space_in_b"))["storage_space_in_b__sum"]
+            .aggregate(models.Sum("storage_space_in_b"))[
+            "storage_space_in_b__sum"]
         if storage is None:
             storage = 0
         return storage
@@ -277,4 +300,3 @@ class SavedJob(models.Model):
             user = user.id
         
         return self.user.id == user
-    
