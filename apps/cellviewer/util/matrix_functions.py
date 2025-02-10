@@ -193,6 +193,9 @@ def calculate_standard_deviation_across_each_well(
     It returns a matrix of the same dimension as the first matrix
     where each well is the standard deviation of all values of that well.
     
+    if the size is smaller than 30, it will use the formula with
+    n - 1
+    
     Args:
         dfs:
 
@@ -205,5 +208,8 @@ def calculate_standard_deviation_across_each_well(
     for df in dfs:
         std_matrix += (df - mean_df) ** 2
     
-    std_matrix = (std_matrix / len(dfs)) ** 0.5
+    n = len(dfs)
+    if n < 30:
+        n = n - 1
+    std_matrix = (std_matrix / n) ** 0.5
     return std_matrix
