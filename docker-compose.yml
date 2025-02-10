@@ -9,14 +9,19 @@ services:
       - db_network
       - web_network
     volumes:
-      - ./db.sqlite3:/db.sqlite3
+      - type: bind
+        source: ${DB_MOUNT}/db.sqlite3
+        target: /db.sqlite3
+      - type : bind 
+        source: ${MEDIA_MOUNT}
+        target: /media
 
   nginx:
     container_name: nginx
     restart: always
     image: "nginx:latest"
     ports:
-      - "5085:5085"
+      - "${OPEN_PORT}:5085"
     volumes:
       - ./nginx:/etc/nginx/conf.d
     networks:

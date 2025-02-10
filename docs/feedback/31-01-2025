@@ -1,0 +1,35 @@
+Feedback at 31/01/2025 by Marlene
+
+Can do everything she wants to do it.
+The colorscheme is good.
+    Made the colorscheme corporate.
+    In the very future it can be user defined
+
+0 values should not be NaN, but should be 0 instead. so they should be white on the dashboard.
+Preference to keep it like this, to have it be clear that it's 0, from the other.
+
+A bug with 0 values not displaying on the page.
+
+Use the sliders, instead of the input fields.
+Display the values of the sliders after having saved, so the user knows the saved thresholds.
+
+The implementation of the standard deviation might be wrong?
+It uses the discrete random variable function, which seems to be wrong.
+Test that it functions correct.
+
+Add the raw counts, and filtered counts to the aggregated excel.
+
+The rounding of the excel might not be mathematically accurate, but is left up as an exercise for the user.
+
+Have it possible to see a line on the histogram to know the value you're selecting:
+    Not possible now.
+Select
+
+From 0 to 100 for percentage
+
+From 0 to max number for cell count, and standard deviation.
+
+Choosing the range, choosing the colors
+    Not possible now.
+
+Search functionality for the experiments should be useful in the future.

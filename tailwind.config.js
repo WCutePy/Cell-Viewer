@@ -3,7 +3,7 @@ module.exports = {
     './templates/**/*.html',
     './static/**/*.js',
     './node_modules/flowbite/**/*.js',
-    './components/**/*'
+    './apps/**/components/**/*'
   ],
   safelist: [
     'w-64',
