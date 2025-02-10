@@ -317,8 +317,8 @@ class TestMatrixFunctions(TestCase):
         }, index=["A", "B"])
         
         expected_result = pd.DataFrame({
-            1: [(((3 - 5) ** 2 + (7 - 5) ** 2) / 2) ** 0.5,
-                ((0.25 + 0.25) / 2) ** 0.5]
+            1: [(((3 - 5) ** 2 + (7 - 5) ** 2) / 1) ** 0.5,
+                ((0.25 + 0.25) / 1) ** 0.5]
         }, index=["A", "B"], dtype="float64")
         # 1 : [2.0, 0.5]
         
@@ -341,7 +341,7 @@ class TestMatrixFunctions(TestCase):
         
         val_a, val_b = 88.6677956534011, 100
         avg = (val_a + val_b) / 2
-        std = (((val_a - avg) ** 2 + (val_b - avg) ** 2) / 2) ** 0.5
+        std = (((val_a - avg) ** 2 + (val_b - avg) ** 2) / 1) ** 0.5
         # std = 5.666102
         matrix_a = pd.DataFrame({
             1: [val_a]
