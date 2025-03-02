@@ -165,7 +165,7 @@ class SavedFileManager(models.Manager):
 
 
 class SavedFile(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     file = models.FileField(upload_to=saved_file_path_func)
     storage_space_in_b = models.IntegerField()
     row_count = models.IntegerField()

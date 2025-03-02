@@ -1,12 +1,25 @@
 
+# Cell Viewer
+
+This application allows the visualization and storing of high throughput microscopic data.
+It is used for preliminary analysis to see if the data is interesting for further analysis.
+
+It allows storing and exporting the results of the analysis and comparing multiple files with each other.
+
+The application expects input in a specific format. A file in the format
+```
+Well,Site,Cell,Substance_1,substance_..,substance_n
+B02,1,1,2.7,..,5
+C02,1,1,3.1,..,4
+```
+In a tabular display this would look like
+| Well | Site | Cell | Substance_1 | substance_.. | substance_n |
+|------|------|------|------------|-------------|-------------|
+| B02  | 1    | 1    | 2.7        | ..          | 5           |
+| C02  | 1    | 1    | 3.1        | ..          | 4           |
 
 
-
-For the developers, when working on django, it can be easier to not run through docker. This can allow more
-freedom and allow for making changes faster. That's why manual installation and run instructions are
-provided. Deployment should always be done through Docker.
-
-# Installation / Setup
+## Installation / Setup
 
 First download or clone the repository.
 You will need to either create an emtpy db.sqlite3 file, or configure the database
@@ -21,7 +34,7 @@ the values OPEN_PORT and OPEN_URL will need to be set appropriately.
 
 When running docker this all that's needed for setup.
 
-## Manual installation:
+### Manual installation:
 
 First you need to have python 3.12.x installed.
 This application runs on 3.12.3
@@ -44,14 +57,14 @@ To be able to make changes to the tailwind css, one needs to install
 `npm install`
 `npm run dev`
 
-# Running
+## Running
 
-## Deploying
+### Deploying
 To deploy it, besides just running it through docker, you will need to set up
 the environment variables. 
 
 
-## Through docker
+### Through docker
 Running and launching through Docker is simple, just
 `docker-compose up --build`
 It should then run at http://localhost:{OPEN_PORT}
@@ -63,7 +76,7 @@ perform a command like `dos2unix *` to get the application to work.
 If it is needed running the docker will show 
 "invalid option| /bin/bash: -"
 
-## manual Running
+### manual Running
 To develop on windows you can run 
 `.\env\Scripts\activate`
 `python manage.py runserver`

@@ -204,7 +204,7 @@ class LabelMatrix(models.Model):
     by multiple Jobs/experiments.
     """
 
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     public = models.BooleanField()
     matrix_name = models.CharField(max_length=255, default="unnamed")
     keep_when_unused = models.BooleanField(default=False)

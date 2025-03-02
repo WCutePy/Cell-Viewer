@@ -220,7 +220,7 @@ class SavedJob(models.Model):
     Doing things that way is a workaround and not the originally
     intended design. However if it works it works.
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=255)
     
     files = models.ManyToManyField(
