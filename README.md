@@ -87,3 +87,6 @@ It's possible to change the port with for example
 When making changes to the tailwind css you need to have a watcher running in a seperate commandline.
 `npx tailwindcss -i ./static/assets/style.css -o ./static/dist/css/output.css --watch`
 
+## Documentation
+
+See [.main_docs.md](docs%2F.main_docs.md) For more details about the documentation of this application.
