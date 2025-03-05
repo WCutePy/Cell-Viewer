@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     
-'django_extensions',
+    # 'django_extensions', # this is used when generating erd image
 
     # "home",
     "apps.users",
