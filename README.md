@@ -90,3 +90,9 @@ When making changes to the tailwind css you need to have a watcher running in a 
 ## Documentation
 
 See [.main_docs.md](docs%2F.main_docs.md) For more details about the documentation of this application.
+
+## Short demo
+
+A quick demo to display the application has been added.
+
+![](docs%2FCell-Viewer%20usage%20demo%20video.mp4)
