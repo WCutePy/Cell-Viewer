@@ -93,6 +93,6 @@ See [.main_docs.md](docs%2F.main_docs.md) For more details about the documentati
 
 ## Short demo
 
-A quick demo to display the application has been added.
+A quick demo to display the application has been added. This might not render, so see the docs directory for the video
 
 <video controls src="docs/Cell-Viewer usage demo video.mp4" title="Demo video" width="320" height="240"></video>
