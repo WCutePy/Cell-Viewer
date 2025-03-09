@@ -95,4 +95,4 @@ See [.main_docs.md](docs%2F.main_docs.md) For more details about the documentati
 
 A quick demo to display the application has been added.
 
-<video controls src="docs/Cell-Viewer usage demo video.mp4" title="Title"></video>
+<video controls src="docs/Cell-Viewer usage demo video.mp4" title="Demo video" width="320" height="240"></video>
