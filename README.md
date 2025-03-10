@@ -91,7 +91,10 @@ When making changes to the tailwind css you need to have a watcher running in a 
 
 See [.main_docs.md](docs%2F.main_docs.md) For more details about the documentation of this application.
 
-## Short demo
+### Presentation
+A presentation has been added to highlight the scope of the project and to explain the project.
+
+### Short demo
 
 A quick demo to display the application has been added.
 
