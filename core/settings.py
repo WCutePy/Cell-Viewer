@@ -15,6 +15,8 @@ from pathlib        import Path
 from dotenv         import load_dotenv
 from str2bool       import str2bool
 from django.contrib import messages
+import ldap
+from django_auth_ldap.config import LDAPSearch
 
 load_dotenv()  # take environment variables from .env.
 
@@ -87,6 +89,18 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
+
+AUTHENTICATION_BACKENDS = ["django_auth_ldap.backend.LDAPBackend"]
+
+AUTH_LDAP_SERVER_URI = "ldap://researchlumc.nl"
+AUTH_LDAP_BIND_DN = "CN=ldapbrowse,CN=Users,DC=researchlumc,dc=nl"
+AUTH_LDAP_BIND_PASSWORD = os.environ.get("AUTH_LDAP_BIND_PASSWORD")
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    # "ou=users,dc=example,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"
+    "ou=LUMC,dc=researchlumc,dc=nl",
+    ldap.SCOPE_SUBTREE,
+    "(sAMAccountName=%(user)s)"
+)
 
 ROOT_URLCONF = "core.urls"
 
