@@ -92,7 +92,8 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = ["django_auth_ldap.backend.LDAPBackend"]
 
-AUTH_LDAP_SERVER_URI = "ldap://researchlumc.nl"
+# AUTH_LDAP_SERVER_URI = "ldap://researchlumc.nl"
+AUTH_LDAP_SERVER_URI = "ldaps://researchlumc.nl:636"
 AUTH_LDAP_BIND_DN = "CN=ldapbrowse,CN=Users,DC=researchlumc,dc=nl"
 AUTH_LDAP_BIND_PASSWORD = os.environ.get("AUTH_LDAP_BIND_PASSWORD")
 AUTH_LDAP_USER_SEARCH = LDAPSearch(

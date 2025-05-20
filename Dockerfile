@@ -3,6 +3,7 @@ FROM python:3.12.7
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV LDAPTLS_REQCERT=never
 
 COPY requirements.txt .
 # install python dependencies
