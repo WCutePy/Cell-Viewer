@@ -24,6 +24,8 @@ services:
       - "${OPEN_PORT}:5085"
     volumes:
       - ./nginx:/etc/nginx/conf.d
+      - ./certs/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
+      - ./certs/web.key:/etc/ssl/private/web.key:ro
     networks:
       - web_network
     depends_on:

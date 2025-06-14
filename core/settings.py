@@ -11,17 +11,18 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os, random, string
-from pathlib        import Path
-from dotenv         import load_dotenv
-from str2bool       import str2bool
+from pathlib import Path
+from dotenv import load_dotenv
+from str2bool import str2bool
 from django.contrib import messages
 import ldap
 from django_auth_ldap.config import LDAPSearch
 
-load_dotenv()  # take environment variables from .env.
+# load_dotenv()  # take environment variables from .env.
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(dotenv_path=BASE_DIR / '.env')  # take environment variables from .env.
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -297,8 +298,8 @@ REST_FRAMEWORK = {
 }
 ########################################
 
-# risky
-SESSION_COOKIE_HTTPONLY=False
+# risky if False
+SESSION_COOKIE_HTTPONLY=True
 
 MESSAGE_TAGS = {
     messages.INFO: 'text-blue-800 border border-blue-300 bg-blue-50 dark:text-blue-400 dark:border-blue-800',
@@ -328,3 +329,8 @@ COMPONENTS = {
          os.path.join(BASE_DIR, "components"),
      ],
 }
+
+# enabling https
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
