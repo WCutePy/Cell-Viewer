@@ -65,7 +65,6 @@ def index_follow_up_input(request):
         return preprocess
     
     file = request.FILES.getlist("inputData")[0]
-    print(file)
     df = pl.read_csv(file)
     
     header = df.columns
@@ -238,22 +237,17 @@ def index_file_preprocess_checking(request):
         
         # content = file.file.read().decode("utf-8")
         
-        file.file.seek(0)
         n = len(header) - 3
+        file.file.seek(0)
+        file_iter = iter(file.file)
+        next(file_iter)
 
         # A regex for a signle line
-        # A23,100,200,1.23,4,5.67 (n extra columns)
+        # A23,100,200,1.23,4,5.67 (plus n extra columns)
         match_line_pattern = fr"^[A-Z]\d{{0,3}},\d+,\d+(,\d+\.?\d*){{{n}}}$"
         match_line = re.compile(match_line_pattern)
         
-        line_number = 0 
-        for raw_line in file.file:
-            line_number += 1
-
-            # skip header
-            if line_number == 1:
-                continue
-
+        for line_number, raw_line in enumerate(file_iter, start=2):
             # decode if bytes
             if isinstance(raw_line, bytes):
                 raw_line = raw_line.decode("utf-8", errors="replace")
@@ -264,7 +258,10 @@ def index_file_preprocess_checking(request):
             if not match_line.match(line):
                 response_title = "Wrong file format"
                 response_text +=  f"Format error on line {line_number}: {line}"
-    
+
+        # reset the file cursor
+        file.file.seek(0)
+
     if response_title or response_text:
         html_content = ResponseModal.render(
             args=(response_title, response_text)
