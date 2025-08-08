@@ -65,6 +65,7 @@ def index_follow_up_input(request):
         return preprocess
     
     file = request.FILES.getlist("inputData")[0]
+    print(file)
     df = pl.read_csv(file)
     
     header = df.columns
@@ -235,20 +236,34 @@ def index_file_preprocess_checking(request):
                               "Cell")
             break
         
-        content = file.file.read().decode("utf-8")
+        # content = file.file.read().decode("utf-8")
         
         file.file.seek(0)
         n = len(header) - 3
-        match_line = fr"[A-Z]\d{{,3}},\d+,\d+(,{r"\d+\.?\d*"}){{{n}}}"
-        match_enter = r"(\r\n|\r|\n)"
-        pattern = fr"^({match_line}{match_enter})+({match_line}{match_enter}?)$"
-        file_format_match = re.fullmatch(pattern, content)
+
+        # A regex for a signle line
+        # A23,100,200,1.23,4,5.67 (n extra columns)
+        match_line_pattern = fr"^[A-Z]\d{{0,3}},\d+,\d+(,\d+\.?\d*){{{n}}}$"
+        match_line = re.compile(match_line_pattern)
         
-        if file_format_match is None:
-            response_title = "Wrong file format"
-            response_text += ("There is a mistake in the file somewhere, "
-                              "a "
-                              "mistaken input is somewhere ")
+        line_number = 0 
+        for raw_line in file.file:
+            line_number += 1
+
+            # skip header
+            if line_number == 1:
+                continue
+
+            # decode if bytes
+            if isinstance(raw_line, bytes):
+                raw_line = raw_line.decode("utf-8", errors="replace")
+
+            line = raw_line.strip("\r\n")
+
+            # Check against regex
+            if not match_line.match(line):
+                response_title = "Wrong file format"
+                response_text +=  f"Format error on line {line_number}: {line}"
     
     if response_title or response_text:
         html_content = ResponseModal.render(
