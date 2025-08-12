@@ -235,21 +235,33 @@ def index_file_preprocess_checking(request):
                               "Cell")
             break
         
-        content = file.file.read().decode("utf-8")
+        # content = file.file.read().decode("utf-8")
         
-        file.file.seek(0)
         n = len(header) - 3
-        match_line = fr"[A-Z]\d{{,3}},\d+,\d+(,{r"\d+\.?\d*"}){{{n}}}"
-        match_enter = r"(\r\n|\r|\n)"
-        pattern = fr"^({match_line}{match_enter})+({match_line}{match_enter}?)$"
-        file_format_match = re.fullmatch(pattern, content)
+        file.file.seek(0)
+        file_iter = iter(file.file)
+        next(file_iter)
+
+        # A regex for a signle line
+        # A23,100,200,1.23,4,5.67 (plus n extra columns)
+        match_line_pattern = fr"^[A-Z]\d{{0,3}},\d+,\d+(,\d+\.?\d*){{{n}}}$"
+        match_line = re.compile(match_line_pattern)
         
-        if file_format_match is None:
-            response_title = "Wrong file format"
-            response_text += ("There is a mistake in the file somewhere, "
-                              "a "
-                              "mistaken input is somewhere ")
-    
+        for line_number, raw_line in enumerate(file_iter, start=2):
+            # decode if bytes
+            if isinstance(raw_line, bytes):
+                raw_line = raw_line.decode("utf-8", errors="replace")
+
+            line = raw_line.strip("\r\n")
+
+            # Check against regex
+            if not match_line.match(line):
+                response_title = "Wrong file format"
+                response_text +=  f"Format error on line {line_number}: {line}"
+
+        # reset the file cursor
+        file.file.seek(0)
+
     if response_title or response_text:
         html_content = ResponseModal.render(
             args=(response_title, response_text)
