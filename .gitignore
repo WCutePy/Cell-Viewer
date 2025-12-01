@@ -6,6 +6,7 @@
 /docs/_build/
 /node_modules/
 build/
+certs/
 env
 env_linux
 db.sqlite3

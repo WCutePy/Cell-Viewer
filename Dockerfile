@@ -6,9 +6,6 @@ ENV PYTHONUNBUFFERED 1
 ENV LDAPTLS_REQCERT=never
 
 COPY requirements.txt .
-# install python dependencies
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
 # add no caching ot this for production with --no-cache-dir
 
 COPY . .
@@ -16,7 +13,7 @@ COPY . .
 # Install node 18 and npm
 RUN set -uex; \
     apt-get update; \
-    apt-get install -y ca-certificates curl gnupg; \
+    apt-get install -y ca-certificates curl gnupg libsasl2-dev libldap2-dev libssl-dev; \
     mkdir -p /etc/apt/keyrings; \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
      | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg; \
@@ -26,6 +23,10 @@ RUN set -uex; \
     apt-get update; \
     apt-get install nodejs -y;
 
+# install python dependencies
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+    
 # Install Modules, Webpack and Tailwind set up
 RUN npm i
 RUN npm run build
