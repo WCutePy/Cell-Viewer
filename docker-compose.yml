@@ -21,7 +21,7 @@ services:
     restart: always
     image: "nginx:latest"
     ports:
-      - "${OPEN_PORT}:5085"
+      - "${OPEN_PORT}:443"
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./certs/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
