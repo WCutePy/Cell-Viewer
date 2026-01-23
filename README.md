@@ -91,6 +91,21 @@ When making changes to the tailwind css you need to have a watcher running in a 
 
 See [.main_docs.md](docs%2F.main_docs.md) For more details about the documentation of this application.
 
+## LDAP and HTTPS implementation
+To enable LDAP authentication and HTTPS in this application, the following changes where required
+
+### LDAP
+* Install additional system-level packages in `Dockerfile` that are required for python ldap packages
+* Add python ldap package and related dependencies in `requirements.txt`
+* Configure LDAP related settings in `core/settings.py`
+
+### HTPPS
+* Enable HTTPS by setting a security related variables in `core/settings.py`
+* Mount the certificate files in  `docker-compose.yml`
+* Configure nginx (via`nginx/cellviewer-app.conf`) to use the certificated and serve traffic over HTPPS
+* Expose and forward the HTPPS required ports in `docker-compose.yml`
+
+
 ### Presentation
 A presentation has been added to highlight the scope of the project and to explain the project.
 
